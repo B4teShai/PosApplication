@@ -18,7 +18,7 @@ namespace PosApplication
             this.tabControl = new System.Windows.Forms.TabControl();
             this.tabProducts = new System.Windows.Forms.TabPage();
             this.tabCategories = new System.Windows.Forms.TabPage();
-            this.tabHelp = new System.Windows.Forms.TabPage();
+            this.tabReports = new System.Windows.Forms.TabPage();
             
             // Product Tab Controls
             this.productDataGridView = new System.Windows.Forms.DataGridView();
@@ -32,7 +32,7 @@ namespace PosApplication
             this.btnEditCategory = new System.Windows.Forms.Button();
             this.btnDeleteCategory = new System.Windows.Forms.Button();
             
-            // Help Tab Controls
+            // Reports Tab Controls
             this.helpTextBox = new System.Windows.Forms.TextBox();
             
             // TabControl
@@ -46,8 +46,8 @@ namespace PosApplication
             this.tabCategories.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.categoryDataGridView)).BeginInit();
             
-            // Help Tab
-            this.tabHelp.SuspendLayout();
+            // Reports Tab
+            this.tabReports.SuspendLayout();
             
             this.SuspendLayout();
             
@@ -58,7 +58,7 @@ namespace PosApplication
             // tabControl
             this.tabControl.Controls.Add(this.tabProducts);
             this.tabControl.Controls.Add(this.tabCategories);
-            this.tabControl.Controls.Add(this.tabHelp);
+            this.tabControl.Controls.Add(this.tabReports);
             this.tabControl.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl.Location = new System.Drawing.Point(0, 0);
             this.tabControl.Name = "tabControl";
@@ -201,15 +201,15 @@ namespace PosApplication
             this.btnDeleteCategory.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnDeleteCategory.Click += new System.EventHandler(this.btnDeleteCategory_Click);
             
-            // tabHelp
-            this.tabHelp.Controls.Add(this.helpTextBox);
-            this.tabHelp.Location = new System.Drawing.Point(4, 24);
-            this.tabHelp.Name = "tabHelp";
-            this.tabHelp.Padding = new System.Windows.Forms.Padding(3);
-            this.tabHelp.Size = new System.Drawing.Size(792, 422);
-            this.tabHelp.TabIndex = 2;
-            this.tabHelp.Text = "Help";
-            this.tabHelp.BackColor = System.Drawing.Color.FromArgb(245, 245, 255);
+            // tabReports
+            this.tabReports.Controls.Add(this.helpTextBox);
+            this.tabReports.Location = new System.Drawing.Point(4, 24);
+            this.tabReports.Name = "tabReports";
+            this.tabReports.Padding = new System.Windows.Forms.Padding(3);
+            this.tabReports.Size = new System.Drawing.Size(792, 422);
+            this.tabReports.TabIndex = 2;
+            this.tabReports.Text = "Reports";
+            this.tabReports.BackColor = System.Drawing.Color.FromArgb(245, 245, 255);
             
             // helpTextBox
             this.helpTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -236,15 +236,15 @@ namespace PosApplication
             ((System.ComponentModel.ISupportInitialize)(this.productDataGridView)).EndInit();
             this.tabCategories.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.categoryDataGridView)).EndInit();
-            this.tabHelp.ResumeLayout(false);
-            this.tabHelp.PerformLayout();
+            this.tabReports.ResumeLayout(false);
+            this.tabReports.PerformLayout();
             this.ResumeLayout(false);
         }
 
         private System.Windows.Forms.TabControl tabControl;
         private System.Windows.Forms.TabPage tabProducts;
         private System.Windows.Forms.TabPage tabCategories;
-        private System.Windows.Forms.TabPage tabHelp;
+        private System.Windows.Forms.TabPage tabReports;
         private System.Windows.Forms.DataGridView productDataGridView;
         private System.Windows.Forms.Button btnAddProduct;
         private System.Windows.Forms.Button btnEditProduct;

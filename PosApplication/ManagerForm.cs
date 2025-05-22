@@ -18,6 +18,9 @@ namespace PosApplication
         private readonly ProductService _productService;
         private readonly SaleService _saleService;
         private readonly ReceiptService _receiptService;
+        private Button btnSalesReport;
+        private Panel productButtonPanel;
+        private Panel categoryButtonPanel;
 
         public ManagerForm(UserService userService, ProductService productService, SaleService saleService, ReceiptService receiptService)
         {
@@ -30,7 +33,133 @@ namespace PosApplication
             _productService = productService;
             _saleService = saleService;
             _receiptService = receiptService;
+            InitializeCustomComponents();
             InitializeData();
+        }
+
+        private void InitializeCustomComponents()
+        {
+            // Initialize Product Tab
+            InitializeProductTab();
+
+            // Initialize Category Tab
+            InitializeCategoryTab();
+
+            // Initialize Reports Tab
+            InitializeReportsTab();
+        }
+
+        private void InitializeProductTab()
+        {
+            // Create button panel
+            productButtonPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 50
+            };
+
+            // Create and add buttons
+            var btnAddProduct = new Button
+            {
+                Text = "Add Product",
+                Location = new Point(10, 10),
+                Size = new Size(100, 30)
+            };
+            btnAddProduct.Click += btnAddProduct_Click;
+
+            var btnEditProduct = new Button
+            {
+                Text = "Edit Product",
+                Location = new Point(120, 10),
+                Size = new Size(100, 30)
+            };
+            btnEditProduct.Click += btnEditProduct_Click;
+
+            var btnDeleteProduct = new Button
+            {
+                Text = "Delete Product",
+                Location = new Point(230, 10),
+                Size = new Size(100, 30)
+            };
+            btnDeleteProduct.Click += btnDeleteProduct_Click;
+
+            productButtonPanel.Controls.AddRange(new Control[] { btnAddProduct, btnEditProduct, btnDeleteProduct });
+            tabProducts.Controls.Add(productButtonPanel);
+
+            // Add DataGridView
+            if (productDataGridView != null)
+            {
+                productDataGridView.Parent = tabProducts;
+                productDataGridView.Dock = DockStyle.Fill;
+                productDataGridView.BringToFront();
+            }
+        }
+
+        private void InitializeCategoryTab()
+        {
+            // Create button panel
+            categoryButtonPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 50
+            };
+
+            // Create and add buttons
+            var btnAddCategory = new Button
+            {
+                Text = "Add Category",
+                Location = new Point(10, 10),
+                Size = new Size(100, 30)
+            };
+            btnAddCategory.Click += btnAddCategory_Click;
+
+            var btnEditCategory = new Button
+            {
+                Text = "Edit Category",
+                Location = new Point(120, 10),
+                Size = new Size(100, 30)
+            };
+            btnEditCategory.Click += btnEditCategory_Click;
+
+            var btnDeleteCategory = new Button
+            {
+                Text = "Delete Category",
+                Location = new Point(230, 10),
+                Size = new Size(100, 30)
+            };
+            btnDeleteCategory.Click += btnDeleteCategory_Click;
+
+            categoryButtonPanel.Controls.AddRange(new Control[] { btnAddCategory, btnEditCategory, btnDeleteCategory });
+            tabCategories.Controls.Add(categoryButtonPanel);
+
+            // Add DataGridView
+            if (categoryDataGridView != null)
+            {
+                categoryDataGridView.Parent = tabCategories;
+                categoryDataGridView.Dock = DockStyle.Fill;
+                categoryDataGridView.BringToFront();
+            }
+        }
+
+        private void InitializeReportsTab()
+        {
+            // Add Sales Report button to Reports tab
+            btnSalesReport = new Button
+            {
+                Text = "View Sales Report",
+                Location = new Point(20, 20),
+                Size = new Size(150, 30)
+            };
+            btnSalesReport.Click += BtnSalesReport_Click;
+            tabReports.Controls.Add(btnSalesReport);
+        }
+
+        private void BtnSalesReport_Click(object sender, EventArgs e)
+        {
+            using (var form = new SalesReportForm(_saleService, _receiptService))
+            {
+                form.ShowDialog();
+            }
         }
 
         private void InitializeData()

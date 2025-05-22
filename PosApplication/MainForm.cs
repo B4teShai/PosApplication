@@ -197,14 +197,14 @@ namespace PosApplication
                     item.Text = product.Name; 
                     item.ImageKey = product.Id.ToString();
                     item.Tag = product;
-                    item.ToolTipText = $"Нэр: {product.Name}\nҮнэ: ${product.Price:F2}\nҮлдэгдэл: {product.StockQuantity}";
+                    item.ToolTipText = $"Name: {product.Name}\nPrice: ${product.Price:F2}\nStock: {product.StockQuantity}";
                     
                     lvProducts.Items.Add(item);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Бүтээгдэхүүнүүдийг ачаалахад алдаа гарлаа: {ex.Message}", "Алдаа", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Error loading products: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

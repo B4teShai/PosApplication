@@ -62,7 +62,7 @@ namespace PosApplication
                 }
                 else
                 {
-                    MessageBox.Show("Invalid username or password!\n\nPlease try with:\n- Username: manager, Password: manager123\n- Username: cashier1, Password: cashier123", 
+                    MessageBox.Show("Invalid username or password!\n\nPlease try again.", 
                         "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }

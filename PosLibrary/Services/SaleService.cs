@@ -78,6 +78,22 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
+        /// Тодорхой огнооны хооронд хийсэн борлуулалтыг татаж авна.
+        /// </summary>
+        /// <param name="startDate">Эхлэх огноо.</param>
+        /// <param name="endDate">Төгсгөлийн огноо.</param>
+        /// <returns>Тухайн хугацааны борлуулалтын жагсаалт.</returns>
+        public List<Sale> GetSalesByDateRange(DateTime startDate, DateTime endDate)
+        {
+            return _context.Sales
+                .Include(s => s.Items)
+                .Include(s => s.User)
+                .Where(s => s.CreatedAt >= startDate && s.CreatedAt <= endDate)
+                .OrderByDescending(s => s.CreatedAt)
+                .ToList();
+        }
+
+        /// <summary>
         /// Тодорхой өдрийн бүх борлуулалтыг татаж авна.
         /// </summary>
         /// <param name="date">Борлуулалтыг татаж авах өдөр.</param>

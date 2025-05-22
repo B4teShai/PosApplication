@@ -50,14 +50,19 @@ namespace PosApplication
                 using (var scope = ServiceProvider.CreateScope())
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    try
+                    
+                    // Check if database exists
+                    if (!dbContext.Database.CanConnect())
                     {
-                        DbInitializer.Initialize(dbContext).GetAwaiter().GetResult();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Database initialization error: {ex.Message}", 
-                            "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        try
+                        {
+                            DbInitializer.Initialize(dbContext).GetAwaiter().GetResult();
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Database initialization error: {ex.Message}", 
+                                "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
                     }
                 }
             }
