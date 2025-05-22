@@ -112,7 +112,6 @@ namespace PosLibrary.Data
                 .WithMany()
                 .HasForeignKey(ci => ci.ProductId);
 
-            // Add seed data - don't query the database here
             SeedDefaultUsers(modelBuilder);
         }
 

@@ -16,6 +16,9 @@ namespace PosTest
         private ReceiptService _receiptService;
         private Sale _testSale;
 
+        /// <summary>
+        /// Тестийн өгөгдлийн сангийн тохиргоог хийж, шаардлагатай үйлчилгээг үүсгэнэ.
+        /// </summary>
         [TestInitialize]
         public void Setup()
         {
@@ -26,7 +29,6 @@ namespace PosTest
             _context = new ApplicationDbContext(options);
             _receiptService = new ReceiptService(_context);
             
-            // Create a test sale with all required properties
             _testSale = new Sale
             {
                 Id = 1,
@@ -48,6 +50,9 @@ namespace PosTest
             };
         }
 
+        /// <summary>
+        /// Тестийн өгөгдлийн сангийн мэдээллийг цэвэрлэнэ.
+        /// </summary>
         [TestCleanup]
         public void Cleanup()
         {
@@ -55,13 +60,14 @@ namespace PosTest
             _context.Dispose();
         }
 
+        /// <summary>
+        /// Борлуулалтын баримтыг зөв форматаар үүсгэх ёстой.
+        /// </summary>
         [TestMethod]
         public void GenerateReceipt_ShouldReturnFormattedReceipt()
         {
-            // Act
             var receipt = _receiptService.GenerateReceipt(_testSale);
 
-            // Assert
             Assert.IsNotNull(receipt);
             Assert.IsTrue(receipt.Contains("POS SYSTEM RECEIPT"));
             Assert.IsTrue(receipt.Contains("Test Product"));
@@ -69,30 +75,30 @@ namespace PosTest
             Assert.IsTrue(receipt.Contains("21.98"));
         }
 
+        /// <summary>
+        /// Хэрэглэгчийн мэдээлэл байхгүй үед баримтыг зөв үүсгэх ёстой.
+        /// </summary>
         [TestMethod]
         public void GenerateReceipt_WithNullUser_ShouldHandleGracefully()
         {
-            // Arrange
             _testSale.User = null;
 
-            // Act
             var receipt = _receiptService.GenerateReceipt(_testSale);
 
-            // Assert
             Assert.IsNotNull(receipt);
             Assert.IsTrue(receipt.Contains("POS SYSTEM RECEIPT"));
         }
 
+        /// <summary>
+        /// Борлуулалтын бараа байхгүй үед баримтыг зөв үүсгэх ёстой.
+        /// </summary>
         [TestMethod]
         public void GenerateReceipt_WithEmptyItems_ShouldHandleGracefully()
         {
-            // Arrange
             _testSale.Items = new List<SaleItem>();
 
-            // Act
             var receipt = _receiptService.GenerateReceipt(_testSale);
 
-            // Assert
             Assert.IsNotNull(receipt);
             Assert.IsTrue(receipt.Contains("POS SYSTEM RECEIPT"));
         }

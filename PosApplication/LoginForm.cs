@@ -9,7 +9,7 @@ namespace PosApplication
 {
     public partial class LoginForm : Form
     {
-        private readonly UserService _userService;
+            private readonly UserService _userService;
         private readonly ProductService _productService;
         private readonly SaleService _saleService;
         private readonly ReceiptService _receiptService;
@@ -22,12 +22,12 @@ namespace PosApplication
             
             var serviceProvider = Program.ServiceProvider;
             
+            // объектуудыг үүсгэх
             _userService = serviceProvider.GetRequiredService<UserService>();
             _productService = serviceProvider.GetRequiredService<ProductService>();
             _saleService = serviceProvider.GetRequiredService<SaleService>();
             _receiptService = serviceProvider.GetRequiredService<ReceiptService>();
             
-            // Initialize database only once
             if (!_databaseInitialized)
             {
                 Program.InitializeDatabase();
@@ -40,27 +40,29 @@ namespace PosApplication
             string username = txtUsername.Text;
             string password = txtPassword.Text;
 
+            // Хэрэглэгчийн нэр болон нууц үгийг шалгах
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                MessageBox.Show("Please enter both username and password.", "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Please enter username and password.", "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             try
             {
-                // Authenticate 
+                // Хэрэглэгчийн мэдээллийг шалгах
                 var user = await _userService.AuthenticateUser(username, password);
                 
                 if (user != null)
                 {
+                    // Үндсэн форм руу шилжих
                     var mainForm = new MainForm(user);
-                    mainForm.FormClosed += (s, args) => this.Show(); // Show login form again when main form closes
+                    mainForm.FormClosed += (s, args) => this.Show();
                     mainForm.Show();
                     this.Hide();
                 }
                 else
                 {
-                    MessageBox.Show("Invalid username or password!\n\nTry these credentials:\n- Username: manager, Password: manager123\n- Username: cashier1, Password: cashier123", 
+                    MessageBox.Show("Invalid username or password!\n\nPlease try with:\n- Username: manager, Password: manager123\n- Username: cashier1, Password: cashier123", 
                         "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
@@ -71,11 +73,13 @@ namespace PosApplication
             }
         }
 
+        // Гарах товч
         private void BtnExit_Click(object sender, EventArgs e)
         {
             Application.Exit();
         }
 
+        // Форм хаагдах
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);

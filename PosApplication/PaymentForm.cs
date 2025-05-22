@@ -40,14 +40,9 @@ namespace PosApplication
 
         private void InitializeData()
         {
-            // Set the total amount label
             totalLabel.Text = $"Total Amount: ${_cart.Total:F2}";
-            
-            // Set the minimum and default value for the amount paid
             amountPaidNumericUpDown.Minimum = _cart.Total;
             amountPaidNumericUpDown.Value = _cart.Total;
-            
-            // Initialize the change label
             UpdateChange();
         }
 
@@ -70,9 +65,7 @@ namespace PosApplication
             
             try
             {
-                // Print receipt
                 await PrintReceipt();
-                
                 DialogResult = DialogResult.OK;
                 Close();
             }
@@ -88,27 +81,20 @@ namespace PosApplication
             
             try
             {
-                // Create receipt content
                 var receipt = await _receiptService.GenerateReceipt(_cart);
-                
-                // Get Documents folder path for saving receipt
                 string documentsPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 string receiptFolder = Path.Combine(documentsPath, "POS_Receipts");
                 
-                // Create the receipts folder if it doesn't exist
                 if (!Directory.Exists(receiptFolder))
                 {
                     Directory.CreateDirectory(receiptFolder);
                 }
                 
-                // Generate the receipt filename with timestamp
                 string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 textPath = Path.Combine(receiptFolder, $"Receipt_{timestamp}.txt");
                 
-                // Save receipt to text file
                 File.WriteAllText(textPath, receipt);
                 
-                // Create a temporary display of purchased items for the user
                 StringBuilder purchasedItems = new StringBuilder();
                 purchasedItems.AppendLine("Purchase Summary:");
                 purchasedItems.AppendLine("------------------");
@@ -123,7 +109,6 @@ namespace PosApplication
                 purchasedItems.AppendLine($"Amount Paid: ${_cart.AmountPaid:F2}");
                 purchasedItems.AppendLine($"Change: ${_cart.AmountPaid - _cart.Total:F2}");
                 
-                // Show success message with purchase summary and receipt file location
                 MessageBox.Show(
                     $"{purchasedItems}\n\nReceipt has been saved to:\n{textPath}", 
                     "Sale Completed Successfully", 
@@ -132,19 +117,16 @@ namespace PosApplication
             }
             catch (IOException ioEx)
             {
-                // Handle file I/O errors
                 MessageBox.Show($"File error while generating receipt: {ioEx.Message}\n\n" +
                     "The payment has been processed, but the receipt could not be saved.",
                     "File Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
             catch (Exception ex)
             {
-                // Handle any other errors
                 MessageBox.Show($"Error generating receipt: {ex.Message}\n\n" +
                     "The payment has been processed, but the receipt could not be generated.",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 
-                // Log the full error for debugging
                 Debug.WriteLine($"Receipt error details: {ex}");
             }
         }

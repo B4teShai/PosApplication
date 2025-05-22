@@ -4,14 +4,14 @@ using System.Collections.Generic;
 namespace PosLibrary.Services
 {
     /// <summary>
-    /// Service for managing shopping cart operations
+    /// Сагс үүсгэх.
     /// </summary>
     public class CartService
     {
         private Cart _currentCart;
 
         /// <summary>
-        /// Initializes a new instance of the CartService class
+        /// Сагс үүсгэх.
         /// </summary>
         public CartService()
         {
@@ -22,20 +22,20 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Gets the current cart
+        /// Сагсыг авна.
         /// </summary>
-        /// <returns>The current cart</returns>
+        /// <returns>Сагс</returns>
         public Cart GetCart()
         {
             return _currentCart;
         }
 
         /// <summary>
-        /// Adds a product to the cart
+        /// Бүтээгдэхүүн нэмэх.
         /// </summary>
-        /// <param name="product">The product to add</param>
-        /// <param name="quantity">The quantity to add</param>
-        /// <returns>True if successful</returns>
+        /// <param name="product">Бүтээгдэхүүн</param>
+        /// <param name="quantity">Тоо</param>
+        /// <returns>Амжилттай эсэхийг буцаана.</returns>
         public bool AddToCart(Product product, int quantity = 1)
         {
             if (product == null || quantity <= 0)
@@ -65,11 +65,11 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Updates the quantity of an item in the cart
+        /// Бүтээгдэхүүн тоог шинэчилэх.
         /// </summary>
-        /// <param name="productId">The product ID</param>
-        /// <param name="quantity">The new quantity</param>
-        /// <returns>True if successful</returns>
+        /// <param name="productId">Бүтээгдэхүүн ID</param>
+        /// <param name="quantity">Шинэ тоо</param>
+        /// <returns>Амжилттай эсэхийг буцаана.</returns>
         public bool UpdateQuantity(int productId, int quantity)
         {
             var item = _currentCart.Items.Find(i => i.ProductId == productId);
@@ -92,10 +92,10 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Removes an item from the cart
+        /// Бүтээгдэхүүн устгах.
         /// </summary>
-        /// <param name="productId">The product ID to remove</param>
-        /// <returns>True if successful</returns>
+        /// <param name="productId">Бүтээгдэхүүн ID</param>
+        /// <returns>Амжилттай эсэхийг буцаана.</returns>
         public bool RemoveFromCart(int productId)
         {
             var item = _currentCart.Items.Find(i => i.ProductId == productId);
@@ -109,7 +109,7 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Clears all items from the cart
+        /// Сагсыг хасах.
         /// </summary>
         public void ClearCart()
         {
@@ -119,7 +119,7 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Updates the cart total based on item subtotals
+        /// Сагсын нийт нийлбэрийг тооцоолно.
         /// </summary>
         private void UpdateCartTotal()
         {

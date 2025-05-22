@@ -29,7 +29,6 @@ namespace PosApplication
                 lstCategories.DisplayMember = "Name";
                 lstCategories.ValueMember = "Id";
                 
-                // Clear form fields
                 ClearFields();
             }
             catch (Exception ex)
@@ -69,7 +68,6 @@ namespace PosApplication
                     
                     if (_selectedCategory == null)
                     {
-                        // Add new category
                         var newCategory = new Category
                         {
                             Name = txtName.Text.Trim(),
@@ -84,7 +82,6 @@ namespace PosApplication
                     }
                     else
                     {
-                        // Update existing category
                         _selectedCategory.Name = txtName.Text.Trim();
                         _selectedCategory.Description = txtDescription.Text.Trim();
                         

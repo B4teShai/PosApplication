@@ -16,6 +16,9 @@ namespace PosTest
         private SaleService _saleService;
         private ProductService _productService;
 
+        /// <summary>
+        /// Тестийн өгөгдлийн сангийн тохиргоог хийж, шаардлагатай үйлчилгээг үүсгэнэ.
+        /// </summary>
         [TestInitialize]
         public void Setup()
         {
@@ -28,6 +31,9 @@ namespace PosTest
             _saleService = new SaleService(_context, _productService);
         }
 
+        /// <summary>
+        /// Тестийн өгөгдлийн сангийн мэдээллийг цэвэрлэнэ.
+        /// </summary>
         [TestCleanup]
         public void Cleanup()
         {
@@ -35,21 +41,20 @@ namespace PosTest
             _context.Dispose();
         }
 
+        /// <summary>
+        /// Хүчинтэй борлуулалтын мэдээлэл оруулахад амжилттай үүсгэгдэх ёстой.
+        /// </summary>
         [TestMethod]
         public async Task CreateSale_WithValidSale_ShouldReturnSale()
         {
-            // Arrange
-            // First create a category
             var category = new Category { Name = "Test Category", Description = "Test Description" };
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
             
-            // Create a product
             var product = new Product { Name = "Test Product", Code = "TP001", Price = 10.99m, StockQuantity = 100, CategoryId = category.Id };
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
-            // Create a user
             var user = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = "Cashier" };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -67,10 +72,8 @@ namespace PosTest
                 }
             };
 
-            // Act
             var result = await _saleService.CreateSale(sale);
 
-            // Assert
             Assert.IsNotNull(result);
             var createdSale = await _context.Sales
                 .Include(s => s.Items)
@@ -79,21 +82,20 @@ namespace PosTest
             Assert.AreEqual(1, createdSale.Items.Count);
         }
 
+        /// <summary>
+        /// Хүчинтэй борлуулалтын ID-аар хайхад борлуулалтын мэдээлэл олддог ёстой.
+        /// </summary>
         [TestMethod]
         public async Task GetSaleById_WithValidId_ShouldReturnSale()
         {
-            // Arrange
-            // First create a category
             var category = new Category { Name = "Test Category", Description = "Test Description" };
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
             
-            // Create a product
             var product = new Product { Name = "Test Product", Code = "TP001", Price = 10.99m, StockQuantity = 100, CategoryId = category.Id };
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
-            // Create a user
             var user = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = "Cashier" };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -111,44 +113,41 @@ namespace PosTest
                 }
             };
             
-            // Save the sale directly to the database
             await _context.Sales.AddAsync(sale);
             await _context.SaveChangesAsync();
 
-            // Act
             var result = await _saleService.GetSaleById(sale.Id);
 
-            // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(sale.Id, result.Id);
             Assert.AreEqual(1, result.Items.Count);
         }
 
+        /// <summary>
+        /// Хүчинтэй бус борлуулалтын ID-аар хайхад null утга буцаах ёстой.
+        /// </summary>
         [TestMethod]
         public async Task GetSaleById_WithInvalidId_ShouldReturnNull()
         {
-            // Act
             var result = await _saleService.GetSaleById(-1);
 
-            // Assert
             Assert.IsNull(result);
         }
 
+        /// <summary>
+        /// Тухайн огнооны борлуулалтын жагсаалтыг амжилттай буцаах ёстой.
+        /// </summary>
         [TestMethod]
         public async Task GetSalesByDate_ShouldReturnFilteredSales()
         {
-            // Arrange
-            // First create a category
             var category = new Category { Name = "Test Category", Description = "Test Description" };
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
             
-            // Create a product
             var product = new Product { Name = "Test Product", Code = "TP001", Price = 10.99m, StockQuantity = 100, CategoryId = category.Id };
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
-            // Create a user
             var user = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = "Cashier" };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -182,23 +181,22 @@ namespace PosTest
                 }
             };
             
-            // Save the sales directly to the database
             await _context.Sales.AddRangeAsync(sales);
             await _context.SaveChangesAsync();
 
-            // Act
             var result = await _saleService.GetSalesByDate(today);
 
-            // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
             Assert.AreEqual(today.Date, result[0].Date.Date);
         }
 
+        /// <summary>
+        /// Борлуулалтын нийт дүнг зөв тооцоолох ёстой.
+        /// </summary>
         [TestMethod]
         public void CalculateTotal_ShouldReturnCorrectTotal()
         {
-            // Arrange
             var sale = new Sale
             {
                 Items = new List<SaleItem>
@@ -208,27 +206,25 @@ namespace PosTest
                 }
             };
 
-            // Act
             var result = _saleService.CalculateTotal(sale);
 
-            // Assert
             Assert.AreEqual(39.95m, result); // (2 * 10.99) + (3 * 5.99) = 21.98 + 17.97 = 39.95
         }
 
+        /// <summary>
+        /// Борлуулалтын харилцагчид буцаах мөнгийг зөв тооцоолох ёстой.
+        /// </summary>
         [TestMethod]
         public void CalculateChange_ShouldReturnCorrectChange()
         {
-            // Arrange
             var sale = new Sale
             {
                 TotalAmount = 25.00m,
                 AmountPaid = 30.00m
             };
 
-            // Act
             var result = _saleService.CalculateChange(sale);
 
-            // Assert
             Assert.AreEqual(5.00m, result);
         }
     }

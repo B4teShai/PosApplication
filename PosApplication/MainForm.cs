@@ -37,30 +37,25 @@ namespace PosApplication
         {
             InitializeComponent();
             
-            // Store the current user
+            // Одоогийн хэрэглэгчийн мэдээллийг хадгалах
             _currentUser = user;
             
-            // Initialize collections
+            // Жагсаалтуудыг анхны тохиргоогоор үүсгэх
             categories = new List<Category>();
             categoryButtons = new Dictionary<int, Button>();
             
-            // Set consistent spacing for products
             SetupProductListSpacing();
-            
-            // Initialize data
+
             InitializeData();
-            
-            // Set up UI based on user role
             ConfigureUIForUserRole();
         }
         
         private void SetupProductListSpacing()
         {
-            // Configure ListView for proper spacing
             lvProducts.View = View.LargeIcon;
             lvProducts.Padding = new Padding(10);
             
-            // Make sure items are properly spaced in the grid
+            // Зургийн жагсаалтыг тохируулах
             ImageList imgList = new ImageList();
             imgList.ImageSize = new Size(160, 160);
             imgList.ColorDepth = ColorDepth.Depth32Bit;
@@ -71,35 +66,30 @@ namespace PosApplication
         {
             try
             {
-                // Create a properly configured DbContext
+                // Өгөгдлийн сангийн тохиргоо
                 var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                     .UseSqlite("Data Source=pos.db")
                     .Options;
                 
                 _dbContext = new ApplicationDbContext(options);
                 
-                // Initialize services with the same context instance
                 _productService = new ProductService(_dbContext);
                 _cartService = new CartService();
                 _saleService = new SaleService(_dbContext);
                 
-                // Initialize category buttons dictionary
                 categoryButtons = new Dictionary<int, Button>();
-                categoryButtons[0] = btnAllCategories; // Add "All" button with ID 0
+                categoryButtons[0] = btnAllCategories;
                 
-                // Load categories first
                 await LoadCategories();
-                
-                // Then load products
+
                 LoadProducts();
                 
-                // Initialize cart
                 _cartService.ClearCart();
                 UpdateCartDisplay();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error initializing data: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Өгөгдлийн тохиргоонд алдаа гарлаа: {ex.Message}", "Алдаа", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -107,38 +97,35 @@ namespace PosApplication
         {
             try
             {
-                // Create default user based on role
+                // Эрхэнд тохируулан анхны хэрэглэгчийн мэдээллийг үүсгэх
                 switch (_userRole)
                 {
                     case PosLibrary.Models.UserRole.Manager:
-                        _currentUser = new Manager { Username = "manager", FullName = "System Manager" };
+                        _currentUser = new Manager { Username = "manager", FullName = "Системийн удирдагч" };
                         break;
                     case PosLibrary.Models.UserRole.Cashier1:
-                        _currentUser = new Cashier { Username = "cashier1", FullName = "Cashier 1" };
+                        _currentUser = new Cashier { Username = "cashier1", FullName = "Кассчин 1" };
                         break;
                     case PosLibrary.Models.UserRole.Cashier2:
-                        _currentUser = new Cashier { Username = "cashier2", FullName = "Cashier 2" };
+                        _currentUser = new Cashier { Username = "cashier2", FullName = "Кассчин 2" };
                         break;
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error setting user: {ex.Message}",
-                    "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Хэрэглэгчийн мэдээлэл тохируулахад алдаа гарлаа: {ex.Message}",
+                    "Нэвтрэх алдаа", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void SetupRoleBasedAccess()
         {
-            this.Text = $"POS System - {_userRole}";
-
-            // Configure menu access based on role
+            this.Text = $"POS Систем - {_userRole}";
             if (_userRole == PosLibrary.Models.UserRole.Cashier1 || _userRole == PosLibrary.Models.UserRole.Cashier2)
             {
                 menuCategory.Visible = false;
             }
 
-            // Product list view - only managers can edit/delete products
             if (_userRole == PosLibrary.Models.UserRole.Manager)
             {
                 lvProducts.MouseClick += LvProducts_MouseClick;
@@ -149,20 +136,17 @@ namespace PosApplication
         {
             try
             {
-                // Use the provided categoryId or the currently selected category
                 int? filterCategoryId = categoryId ?? _selectedCategoryId;
                 
-                // Clear existing items
                 lvProducts.Items.Clear();
                 
-                // Get products (filtered by category if specified)
                 var productsTask = filterCategoryId.HasValue 
                     ? _productService.GetProductsByCategoryAsync(filterCategoryId.Value) 
                     : _productService.GetAllProducts();
                 
                 var products = productsTask.GetAwaiter().GetResult();
                 
-                // Apply search filter if provided
+                // Хайлт
                 if (!string.IsNullOrEmpty(searchTerm))
                 {
                     products = products.Where(p => 
@@ -171,7 +155,7 @@ namespace PosApplication
                         p.Code.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();
                 }
                 
-                // Set up ListView for better display
+                // ListView-г дэлгэрэнгүй харуулах
                 if (lvProducts.LargeImageList == null)
                 {
                     lvProducts.LargeImageList = new ImageList();
@@ -183,10 +167,9 @@ namespace PosApplication
                     lvProducts.LargeImageList.Images.Clear();
                 }
                 
-                // Add products to ListView with improved visual style
+                // Бүтээгдэхүүнүүдийг ListView-д нэмэх
                 foreach (var product in products)
                 {
-                    // Load product image if available
                     Bitmap productImage;
                     
                     if (!string.IsNullOrEmpty(product.ImagePath) && File.Exists(product.ImagePath))
@@ -200,47 +183,40 @@ namespace PosApplication
                         }
                         catch
                         {
-                            // If image loading fails, create default image
                             productImage = CreateProductImage(product);
                         }
                     }
                     else
                     {
-                        // Create a placeholder image for the product
                         productImage = CreateProductImage(product);
                     }
                     
-                    // Add image to the image list
                     lvProducts.LargeImageList.Images.Add(product.Id.ToString(), productImage);
                     
-                    // Create ListView item with the image
                     var item = new ListViewItem();
-                    item.Text = product.Name; // Show product name below the image
+                    item.Text = product.Name; 
                     item.ImageKey = product.Id.ToString();
                     item.Tag = product;
-                    item.ToolTipText = $"Name: {product.Name}\nPrice: ${product.Price:F2}\nStock: {product.StockQuantity}";
+                    item.ToolTipText = $"Нэр: {product.Name}\nҮнэ: ${product.Price:F2}\nҮлдэгдэл: {product.StockQuantity}";
                     
                     lvProducts.Items.Add(item);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading products: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Бүтээгдэхүүнүүдийг ачаалахад алдаа гарлаа: {ex.Message}", "Алдаа", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private Bitmap CreateProductImage(Product product)
         {
-            // Create a bitmap for the product with larger dimensions for better visibility
             Bitmap bmp = new Bitmap(160, 160);
             using (Graphics g = Graphics.FromImage(bmp))
             {
-                // Enable high quality rendering
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 
-                // Fill background with a more appealing gradient
                 using (LinearGradientBrush brush = new LinearGradientBrush(
                     new Rectangle(0, 0, bmp.Width, bmp.Height),
                     Color.FromArgb(250, 250, 255),
@@ -250,7 +226,6 @@ namespace PosApplication
                     g.FillRectangle(brush, 0, 0, bmp.Width, bmp.Height);
                 }
                 
-                // Draw a more elegant border with rounded corners
                 Rectangle borderRect = new Rectangle(1, 1, bmp.Width - 3, bmp.Height - 3);
                 using (GraphicsPath borderPath = CreateRoundedRectangle(borderRect, 8))
                 using (Pen pen = new Pen(Color.FromArgb(180, 180, 220), 2))
@@ -258,7 +233,6 @@ namespace PosApplication
                     g.DrawPath(pen, borderPath);
                 }
                 
-                // Add subtle inner shadow effect
                 Rectangle shadowRect = new Rectangle(3, 3, bmp.Width - 7, bmp.Height - 7);
                 using (GraphicsPath shadowPath = CreateRoundedRectangle(shadowRect, 7))
                 using (PathGradientBrush shadowBrush = new PathGradientBrush(shadowPath))
@@ -268,14 +242,12 @@ namespace PosApplication
                     g.FillPath(shadowBrush, shadowPath);
                 }
                 
-                // Draw product code with better styling
                 using (Font codeFont = new Font("Segoe UI", 9, FontStyle.Italic))
                 using (SolidBrush codeBrush = new SolidBrush(Color.FromArgb(130, 130, 150)))
                 {
                     g.DrawString(product.Code, codeFont, codeBrush, new PointF(10, 10));
                 }
                 
-                // Draw name box background with improved gradient and larger area
                 Rectangle nameBox = new Rectangle(10, 28, bmp.Width - 20, 48);
                 using (GraphicsPath namePath = CreateRoundedRectangle(nameBox, 6))
                 using (LinearGradientBrush nameBgBrush = new LinearGradientBrush(
@@ -286,7 +258,6 @@ namespace PosApplication
                 {
                     g.FillPath(nameBgBrush, namePath);
                     
-                    // Add subtle highlight to the top of the name box
                     using (LinearGradientBrush highlightBrush = new LinearGradientBrush(
                         new Rectangle(nameBox.X, nameBox.Y, nameBox.Width, 6),
                         Color.FromArgb(60, 255, 255, 255),
@@ -297,10 +268,8 @@ namespace PosApplication
                     }
                 }
                 
-                // Draw product name with better shadow and text handling
                 using (Font nameFont = new Font("Segoe UI", 12, FontStyle.Bold))
                 {
-                    // Create a StringFormat object for center alignment
                     StringFormat nameFormat = new StringFormat();
                     nameFormat.Alignment = StringAlignment.Center;
                     nameFormat.LineAlignment = StringAlignment.Center;
@@ -318,8 +287,7 @@ namespace PosApplication
                         g.DrawString(product.Name, nameFont, nameBrush, nameBox, nameFormat);
                     }
                 }
-                
-                // Price box with rounded corners and gradient
+
                 Rectangle priceBox = new Rectangle(20, 90, bmp.Width - 40, 30);
                 using (GraphicsPath pricePath = CreateRoundedRectangle(priceBox, 5))
                 using (LinearGradientBrush priceBgBrush = new LinearGradientBrush(
@@ -330,14 +298,12 @@ namespace PosApplication
                 {
                     g.FillPath(priceBgBrush, pricePath);
                     
-                    // Add border to price box
                     using (Pen priceBorderPen = new Pen(Color.FromArgb(190, 190, 200), 1))
                     {
                         g.DrawPath(priceBorderPen, pricePath);
                     }
                 }
                 
-                // Draw price with currency symbol with improved styling
                 using (Font priceFont = new Font("Segoe UI", 14, FontStyle.Bold))
                 using (SolidBrush priceBrush = new SolidBrush(Color.FromArgb(20, 110, 20)))
                 {
@@ -348,19 +314,16 @@ namespace PosApplication
                     g.DrawString($"${product.Price:F2}", priceFont, priceBrush, priceBox, priceFormat);
                 }
                 
-                // Draw stock info with improved visual representation
                 int stockIndicatorSize = 12;
                 Color stockColor = product.StockQuantity > 10 ? Color.FromArgb(0, 160, 0) : 
                                   product.StockQuantity > 0 ? Color.FromArgb(240, 150, 0) : 
                                   Color.FromArgb(200, 40, 40);
                 
-                // Draw stock indicator with gradient and glow effect
                 Rectangle stockIndicatorRect = new Rectangle(15, 130, stockIndicatorSize, stockIndicatorSize);
                 using (GraphicsPath stockPath = new GraphicsPath())
                 {
                     stockPath.AddEllipse(stockIndicatorRect);
                     
-                    // Fill with gradient for better look
                     using (PathGradientBrush stockBrush = new PathGradientBrush(stockPath))
                     {
                         Color centerColor = Color.FromArgb(255, stockColor);
@@ -372,7 +335,6 @@ namespace PosApplication
                         g.FillPath(stockBrush, stockPath);
                     }
                     
-                    // Add highlight to indicator
                     using (GraphicsPath highlightPath = new GraphicsPath())
                     {
                         highlightPath.AddEllipse(new Rectangle(stockIndicatorRect.X + 2, stockIndicatorRect.Y + 2, 
@@ -384,7 +346,6 @@ namespace PosApplication
                     }
                 }
                 
-                // Draw stock text with improved formatting
                 using (Font stockFont = new Font("Segoe UI", 9))
                 using (SolidBrush stockTextBrush = new SolidBrush(Color.FromArgb(70, 70, 80)))
                 {
@@ -400,16 +361,12 @@ namespace PosApplication
 
         private void LvProducts_DrawItem(object sender, DrawListViewItemEventArgs e)
         {
-            // Do NOT use default drawing - we'll handle everything manually
             e.DrawDefault = false;
             
-            // Get product from tag
             if (e.Item.Tag is Product product)
             {
-                // Set consistent margins for each item
                 const int margin = 5;
                 
-                // Calculate item rectangle (just for the image area, not including text)
                 int imageHeight = lvProducts.LargeImageList.ImageSize.Height;
                 var imageRect = new Rectangle(
                     e.Bounds.X + margin,
@@ -418,25 +375,21 @@ namespace PosApplication
                     imageHeight
                 );
                 
-                // Draw background with semi-transparency
                 if ((e.State & ListViewItemStates.Selected) != 0)
                 {
-                    // Draw a selection effect with rounded corners
                     using (var path = CreateRoundedRectangle(imageRect, 8))
                     {
                         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
                         
-                        // Semi-transparent selection background
                         using (var brush = new LinearGradientBrush(
                             imageRect,
-                            Color.FromArgb(100, 220, 230, 250), // More transparent
-                            Color.FromArgb(100, 180, 200, 240), // More transparent
+                            Color.FromArgb(100, 220, 230, 250),
+                            Color.FromArgb(100, 180, 200, 240),
                             45F))
                         {
                             e.Graphics.FillPath(brush, path);
                         }
                         
-                        // Selection border
                         using (var pen = new Pen(Color.FromArgb(150, 100, 150, 200), 2))
                         {
                             e.Graphics.DrawPath(pen, path);
@@ -445,22 +398,19 @@ namespace PosApplication
                 }
                 else
                 {
-                    // Draw a subtle background with rounded corners
                     using (var path = CreateRoundedRectangle(imageRect, 8))
                     {
                         e.Graphics.SmoothingMode = SmoothingMode.AntiAlias;
                         
-                        // Semi-transparent regular background
                         using (var brush = new LinearGradientBrush(
                             imageRect,
-                            Color.FromArgb(80, 250, 250, 255), // Very transparent
-                            Color.FromArgb(80, 240, 240, 250), // Very transparent
+                            Color.FromArgb(80, 250, 250, 255),
+                            Color.FromArgb(80, 240, 240, 250),
                             45F))
                         {
                             e.Graphics.FillPath(brush, path);
                         }
                         
-                        // Subtle border
                         using (var pen = new Pen(Color.FromArgb(120, 220, 220, 240), 1))
                         {
                             e.Graphics.DrawPath(pen, path);
@@ -468,7 +418,6 @@ namespace PosApplication
                     }
                 }
                 
-                // Draw the product image
                 if (e.Item.ImageKey != null && lvProducts.LargeImageList != null)
                 {
                     Image img = lvProducts.LargeImageList.Images[e.Item.ImageKey];
@@ -478,14 +427,12 @@ namespace PosApplication
                     }
                 }
                 
-                // Draw the text below the image
                 string itemText = product.Name;
                 Font textFont = e.Item.Font ?? lvProducts.Font;
                 Brush textBrush = (e.State & ListViewItemStates.Selected) != 0 
                     ? new SolidBrush(Color.FromArgb(0, 70, 140))
                     : new SolidBrush(Color.FromArgb(60, 60, 80));
                 
-                // Calculate text position (centered below the image)
                 StringFormat sf = new StringFormat()
                 {
                     Alignment = StringAlignment.Center,
@@ -570,7 +517,6 @@ namespace PosApplication
             btnIncrease.Click += (s, e) =>
             {
                 int quantity = int.Parse(lblQuantity.Text);
-                // Allow selecting quantity beyond stock level
                 lblQuantity.Text = (++quantity).ToString();
             };
             
@@ -662,22 +608,17 @@ namespace PosApplication
                         }).ToList()
                     };
 
-                    // Show processing cursor
                     this.Cursor = Cursors.WaitCursor;
                     
-                    // Save sale to database - this will also update stock quantities
                     await _saleService.CreateSale(sale);
                     
-                    // Refresh the product list to show updated stock
                     await LoadCategories();
                     LoadProducts();
 
-                    // Clear cart and UI
                     _cartService.ClearCart();
                     UpdateCartDisplay();
                     UpdateTotal();
                     
-                    // Restore cursor
                     this.Cursor = Cursors.Default;
 
                     MessageBox.Show("Sale completed successfully! Stock quantities have been updated.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -694,27 +635,22 @@ namespace PosApplication
         {
             try
             {
-                // Get categories from the service
                 categories = await _productService.GetCategoriesAsync();
                 
-                // Clear existing category buttons except "All"
                 foreach (var kvp in categoryButtons)
                 {
-                    if (kvp.Key != 0) // Keep the "All" button
+                    if (kvp.Key != 0)
                     {
                         pnlCategoryFilter.Controls.Remove(kvp.Value);
                         kvp.Value.Dispose();
                     }
                 }
                 
-                // Clear the dictionary
                 categoryButtons.Clear();
                 
-                // Add "All" button to dictionary
                 categoryButtons[0] = btnAllCategories;
                 
-                // Create buttons for each category
-                int xPosition = 70; // Start position after "All" button
+                int xPosition = 70;
                 
                 foreach (var category in categories)
                 {
@@ -730,10 +666,9 @@ namespace PosApplication
                     pnlCategoryFilter.Controls.Add(categoryButton);
                     categoryButtons[category.Id] = categoryButton;
                     
-                    xPosition += 75; // Increment position for next button
+                    xPosition += 75;
                 }
                 
-                // Update styles based on current category
                 UpdateCategoryButtonStyles();
             }
             catch (Exception ex)
@@ -747,19 +682,15 @@ namespace PosApplication
             Button clickedButton = (Button)sender;
             int categoryId = (int)clickedButton.Tag;
             
-            // Set current category
             _selectedCategoryId = categoryId;
             
-            // Update button styles
             UpdateCategoryButtonStyles();
             
-            // Load products for the selected category
             LoadProducts(categoryId: categoryId);
         }
 
         private void UpdateCategoryButtonStyles()
         {
-            // Reset all buttons
             btnAllCategories.BackColor = Color.FromArgb(240, 240, 240);
             btnAllCategories.ForeColor = Color.Black;
             
@@ -769,7 +700,6 @@ namespace PosApplication
                 button.ForeColor = Color.Black;
             }
 
-            // Set selected button
             if (_selectedCategoryId.HasValue)
             {
                 categoryButtons[_selectedCategoryId.Value].BackColor = Color.FromArgb(100, 150, 200);
@@ -795,15 +725,12 @@ namespace PosApplication
             
             if (e.Button == MouseButtons.Left)
             {
-                // Left click - add to cart
                 AddProductToCart(product);
             }
             else if (e.Button == MouseButtons.Right)
             {
-                // Right click - show context menu for managers
                 var contextMenu = new ContextMenuStrip();
                 
-                // Only add Edit/Delete options for managers
                 if (_currentUser.CanEditProducts())
                 {
                     var editItem = contextMenu.Items.Add("Edit Product");
@@ -824,7 +751,6 @@ namespace PosApplication
 
         private Bitmap CreateMenuIcon(Color color)
         {
-            // Create a small colored icon for the menu items
             Bitmap bmp = new Bitmap(16, 16);
             using (Graphics g = Graphics.FromImage(bmp))
             {
@@ -928,13 +854,10 @@ namespace PosApplication
         
             try
             {
-                // Create product form for editing
                 var productForm = new ProductForm(_productService, product);
                 
-                // Show the form
                 if (productForm.ShowDialog() == DialogResult.OK)
                 {
-                    // Refresh the product list
                     await LoadCategories();
                     LoadProducts();
                     MessageBox.Show($"Product '{product.Name}' updated successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -951,7 +874,6 @@ namespace PosApplication
             if (product == null)
                 return;
         
-            // Show confirmation dialog with product details
             var result = MessageBox.Show(
                 $"Are you sure you want to delete the following product?\n\n" +
                 $"Name: {product.Name}\n" +
@@ -962,24 +884,20 @@ namespace PosApplication
                 "Confirm Delete",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning,
-                MessageBoxDefaultButton.Button2); // Default to "No"
+                MessageBoxDefaultButton.Button2);
         
             if (result == DialogResult.Yes)
             {
                 try
                 {
-                    // Use cursor to indicate operation in progress
                     Cursor = Cursors.WaitCursor;
                     
-                    // Delete the product
                     bool success = await _productService.DeleteProduct(product.Id);
                     
-                    // Reset cursor
                     Cursor = Cursors.Default;
                     
                     if (success)
                     {
-                        // Refresh the product list
                         await LoadCategories();
                         LoadProducts();
                         MessageBox.Show($"Product '{product.Name}' deleted successfully.", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -1001,11 +919,9 @@ namespace PosApplication
         {
             if (_currentUser.Role == PosLibrary.Models.UserRole.Manager)
             {
-                // Open product form for managers
                 var productForm = new ProductForm(_productService);
                 if (productForm.ShowDialog() == DialogResult.OK)
                 {
-                    // Refresh categories and products
                     await LoadCategories();
                     LoadProducts();
                 }
@@ -1020,11 +936,9 @@ namespace PosApplication
         {
             if (_currentUser.Role == PosLibrary.Models.UserRole.Manager)
             {
-                // Open category form for managers
                 var categoryForm = new CategoryForm(_productService);
                 if (categoryForm.ShowDialog() == DialogResult.OK)
                 {
-                    // Refresh categories and products
                     await LoadCategories();
                     LoadProducts();
                 }
@@ -1059,7 +973,7 @@ namespace PosApplication
                 MessageBoxButtons.YesNo, 
                 MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                this.Close(); // Close this form, which will trigger FormClosed event in LoginForm
+                this.Close(); 
             }
         }
 
@@ -1107,7 +1021,6 @@ namespace PosApplication
             _currentTotal = cart.Total;
             lblTotal.Text = $"Total: ${_currentTotal:F2}";
             
-            // Update button appearance based on cart state
             btnCompleteSale.Enabled = _currentTotal > 0;
             btnCompleteSale.BackColor = _currentTotal > 0
                 ? Color.FromArgb(100, 150, 200)
@@ -1164,14 +1077,11 @@ namespace PosApplication
         
             try
             {
-                // Add product to cart using the cart service
                 _cartService.AddToCart(product);
                 
-                // Check if the cart quantity exceeds stock
                 var cartItem = _cartService.GetCart().Items.Find(i => i.ProductId == product.Id);
                 if (cartItem != null && cartItem.Quantity > product.StockQuantity && product.StockQuantity > 0)
                 {
-                    // Inform the user, but allow proceeding with the order
                     MessageBox.Show(
                         $"You've ordered {cartItem.Quantity} units of {product.Name}, but only {product.StockQuantity} are in stock.\n\n" +
                         "Your order can still be processed, but may require additional time for the extra items.",
@@ -1180,7 +1090,6 @@ namespace PosApplication
                         MessageBoxIcon.Information);
                 }
                 
-                // Update the UI
                 UpdateCartDisplay();
                 UpdateTotal();
             }
@@ -1192,13 +1101,9 @@ namespace PosApplication
 
         private void BtnAllCategories_Click(object sender, EventArgs e)
         {
-            // Set current category to null (all categories)
             _selectedCategoryId = null;
-            
-            // Update button styles
+                
             UpdateCategoryButtonStyles();
-            
-            // Load all products
             LoadProducts();
         }
 
@@ -1206,22 +1111,18 @@ namespace PosApplication
         {
             base.OnFormClosing(e);
             
-            // Dispose of the DbContext
             _dbContext?.Dispose();
         }
 
         private void ConfigureUIForUserRole()
         {
-            // Configure menu access based on user role
             if (_currentUser.Role == PosLibrary.Models.UserRole.Manager)
             {
-                // Managers have access to all menu items
                 menuCategory.Visible = true;
                 menuProduct.Visible = true;
             }
             else
             {
-                // Cashiers have limited access
                 menuCategory.Visible = false;
                 menuProduct.Visible = false;
             }
@@ -1231,16 +1132,12 @@ namespace PosApplication
         {
             try
             {
-                // Clear existing controls
                 flowLayoutPanel1.Controls.Clear();
                 
-                // Get current cart
                 var cart = _cartService.GetCart();
                 
-                // Add items to the panel
                 foreach (var item in cart.Items)
                 {
-                    // Create panel for this item with rounded corners and shadow effect
                     var panel = new Panel
                     {
                         Size = new Size(580, 60),
@@ -1248,13 +1145,11 @@ namespace PosApplication
                         Tag = item
                     };
                     
-                    // Custom painting for panel
                     panel.Paint += (s, e) => 
                     {
                         var p = (Panel)s;
                         var g = e.Graphics;
-                        
-                        // Draw rounded rectangle with gradient background
+
                         var rect = new Rectangle(0, 0, p.Width - 1, p.Height - 1);
                         using (var path = CreateRoundedRectangle(rect, 8))
                         using (var brush = new LinearGradientBrush(
@@ -1266,7 +1161,6 @@ namespace PosApplication
                             g.SmoothingMode = SmoothingMode.AntiAlias;
                             g.FillPath(brush, path);
                             
-                            // Draw border
                             using (var pen = new Pen(Color.FromArgb(200, 200, 230), 1))
                             {
                                 g.DrawPath(pen, path);
@@ -1274,7 +1168,6 @@ namespace PosApplication
                         }
                     };
                     
-                    // Product name with custom font and styling
                     var lblName = new Label
                     {
                         Text = item.ProductName,
@@ -1286,7 +1179,6 @@ namespace PosApplication
                     };
                     panel.Controls.Add(lblName);
                     
-                    // Quantity with custom styling
                     var lblQuantityTitle = new Label
                     {
                         Text = "Qty:",
@@ -1310,7 +1202,6 @@ namespace PosApplication
                     };
                     panel.Controls.Add(lblQuantity);
                     
-                    // Unit price with custom styling
                     var lblPriceTitle = new Label
                     {
                         Text = "Price:",
@@ -1333,7 +1224,6 @@ namespace PosApplication
                     };
                     panel.Controls.Add(lblPrice);
                     
-                    // Subtotal with custom styling
                     var lblSubtotalTitle = new Label
                     {
                         Text = "Subtotal:",
@@ -1356,7 +1246,6 @@ namespace PosApplication
                     };
                     panel.Controls.Add(lblSubtotal);
                     
-                    // Quantity adjustment buttons
                     var btnDecrease = new Button
                     {
                         Text = "-",
@@ -1398,15 +1287,12 @@ namespace PosApplication
                         var cartItem = _cartService.GetCart().Items.Find(i => i.ProductId == productId);
                         if (cartItem != null)
                         {
-                            // Get the product to check stock levels
                             var product = _productService.GetProductById(productId).GetAwaiter().GetResult();
                             
-                            // Always increase quantity
                             _cartService.UpdateQuantity(productId, cartItem.Quantity + 1);
                             
-                            // Show notification if exceeding stock
                             if (product != null && cartItem.Quantity + 1 > product.StockQuantity && product.StockQuantity > 0 
-                                && cartItem.Quantity == product.StockQuantity + 1) // Only show once when exceeding stock
+                                && cartItem.Quantity == product.StockQuantity + 1)
                             {
                                 MessageBox.Show(
                                     $"You've ordered {cartItem.Quantity + 1} units of {product.Name}, but only {product.StockQuantity} are in stock.\n\n" +
@@ -1422,7 +1308,6 @@ namespace PosApplication
                     };
                     panel.Controls.Add(btnIncrease);
                     
-                    // Remove button with custom styling
                     var btnRemove = new Button
                     {
                         Text = "×",
@@ -1443,11 +1328,9 @@ namespace PosApplication
                     };
                     panel.Controls.Add(btnRemove);
                     
-                    // Add to flow layout
                     flowLayoutPanel1.Controls.Add(panel);
                 }
                 
-                // Update total
                 UpdateTotal();
             }
             catch (Exception ex)
@@ -1463,18 +1346,14 @@ namespace PosApplication
             Rectangle arc = new Rectangle(bounds.Location, size);
             GraphicsPath path = new GraphicsPath();
 
-            // Top left arc
             path.AddArc(arc, 180, 90);
 
-            // Top right arc
             arc.X = bounds.Right - diameter;
             path.AddArc(arc, 270, 90);
 
-            // Bottom right arc
             arc.Y = bounds.Bottom - diameter;
             path.AddArc(arc, 0, 90);
 
-            // Bottom left arc
             arc.X = bounds.Left;
             path.AddArc(arc, 90, 90);
 

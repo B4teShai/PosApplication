@@ -82,7 +82,7 @@ namespace PosApplication
             if (productDataGridView.SelectedRows.Count > 0)
             {
                 var product = (Product)productDataGridView.SelectedRows[0].DataBoundItem;
-                if (MessageBox.Show("Энэ бүтээгдэхүүнийг устгахдаа итгэлтэй байна уу?", "Баталгаажуулалт",
+                if (MessageBox.Show("Are you sure you want to delete this product?", "Confirmation",
                     MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     _context.Products.Remove(product);
@@ -123,7 +123,7 @@ namespace PosApplication
             if (categoryDataGridView.SelectedRows.Count > 0)
             {
                 var category = (Category)categoryDataGridView.SelectedRows[0].DataBoundItem;
-                if (MessageBox.Show("Энэ ангилалыг устгахдаа итгэлтэй байна уу?", "Баталгаажуулалт",
+                if (MessageBox.Show("Are you sure you want to delete this category?", "Confirmation",
                     MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
                     _context.Categories.Remove(category);

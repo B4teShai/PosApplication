@@ -34,47 +34,44 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Creates a new sale transaction and updates product stock quantities.
+        /// Борлуулалтын төлбөр үүсгэнэ, бүтээгдэхүүнүүдийн нөөцийн хэмжээг шинэчилэнэ.
         /// </summary>
-        /// <param name="sale">The sale transaction to create.</param>
-        /// <returns>The created sale transaction.</returns>
+        /// <param name="sale">Борлуулалтын төлбөр үүсгэх.</param>
+        /// <returns>Үүсгэсэн борлуулалтын төлбөр.</returns>
         public async Task<Sale> CreateSale(Sale sale)
         {
             try
             {
-                // Start a transaction to ensure all updates happen together
                 using var transaction = await _context.Database.BeginTransactionAsync();
                 
-                // Update stock quantities for each item
                 foreach (var item in sale.Items)
                 {
                     var product = await _context.Products.FindAsync(item.ProductId);
                     if (product != null)
                     {
-                        // Calculate new stock quantity (don't go below zero)
                         int newStockQuantity = Math.Max(0, product.StockQuantity - item.Quantity);
                         
-                        // Update product stock directly
+                        // Бүтээгдэхүүн нөөцийн хэмжээг шинэчилэнэ.
                         product.StockQuantity = newStockQuantity;
                         _context.Products.Update(product);
                     }
                 }
                 
-                // Save the stock changes first
+                // Бүтээгдэхүүнүүдийн нөөцийн хэмжээг шинэчилэнэ.
                 await _context.SaveChangesAsync();
                 
-                // Then add and save the sale record
+                // Борлуулалтын төлбөр үүсгэнэ.
                 await _context.Sales.AddAsync(sale);
                 await _context.SaveChangesAsync();
                 
-                // Commit the transaction
+                // Борлуулалтын төлбөр үүсгэнэ.
                 await transaction.CommitAsync();
                 
                 return sale;
             }
             catch (Exception ex)
             {
-                // Log the error and rethrow to let the caller handle it
+                // Алдааг тэмдэглэнэ.
                 Console.WriteLine($"Error in CreateSale: {ex.Message}");
                 throw;
             }

@@ -28,15 +28,14 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Generates a receipt for a cart
+        /// Сагсын баримтыг үүсгэнэ.
         /// </summary>
-        /// <param name="cart">The cart to generate a receipt for</param>
-        /// <returns>A formatted receipt string</returns>
+        /// <param name="cart">Баримт үүсгэх сагс.</param>
+        /// <returns>Форматтай баримтын мөр.</returns>
         public async Task<string> GenerateReceipt(Cart cart)
         {
             var receipt = new StringBuilder();
             
-            // Header
             receipt.AppendLine("=====================================");
             receipt.AppendLine("           POS SYSTEM RECEIPT        ");
             receipt.AppendLine("=====================================");
@@ -46,10 +45,10 @@ namespace PosLibrary.Services
             receipt.AppendLine("Item                Qty    Price    Total");
             receipt.AppendLine("-------------------------------------");
             
-            // Items
+            // Бүтээгдэхүүнүүд
             foreach (var item in cart.Items)
             {
-                // Get product details
+                // Бүтээгдэхүүн дэлгэрэнгүй
                 var product = await _context.Products.FindAsync(item.ProductId);
                 string itemName = product?.Name ?? item.ProductName;
                 string itemCode = product?.Code ?? "";
@@ -58,7 +57,7 @@ namespace PosLibrary.Services
                 receipt.AppendLine($"         {item.Quantity,3} x ${item.UnitPrice,8:F2} = ${item.Subtotal,8:F2}");
             }
             
-            // Totals
+            // Нийт нийлбэр
             receipt.AppendLine("-------------------------------------");
             receipt.AppendLine($"Subtotal:                    ${cart.Total,8:F2}");
             receipt.AppendLine($"Amount Paid:                 ${cart.AmountPaid,8:F2}");
@@ -79,7 +78,6 @@ namespace PosLibrary.Services
         {
             var receipt = new StringBuilder();
             
-            // Header
             receipt.AppendLine("=====================================");
             receipt.AppendLine("           POS SYSTEM RECEIPT        ");
             receipt.AppendLine("=====================================");
@@ -90,14 +88,13 @@ namespace PosLibrary.Services
             receipt.AppendLine("Item                Qty    Price    Total");
             receipt.AppendLine("-------------------------------------");
             
-            // Items
             foreach (var item in sale.Items)
             {
                 receipt.AppendLine($"{item.ProductName}");
                 receipt.AppendLine($"         {item.Quantity,3} x ${item.UnitPrice,8:F2} = ${item.Subtotal,8:F2}");
             }
             
-            // Totals
+            // Нийт 
             receipt.AppendLine("-------------------------------------");
             receipt.AppendLine($"Subtotal:                    ${sale.Total,8:F2}");
             receipt.AppendLine($"Amount Paid:                 ${sale.AmountPaid,8:F2}");
@@ -110,31 +107,29 @@ namespace PosLibrary.Services
         }
         
         /// <summary>
-        /// Generates a PDF file from receipt text
+        /// Баримтын мөрөөс PDF файл үүсгэнэ.
         /// </summary>
-        /// <param name="textFilePath">Path to the text file containing receipt content</param>
-        /// <param name="pdfFilePath">Path where the PDF file should be saved</param>
+        /// <param name="textFilePath">Баримтын мөрөөс үүсгэх файлын зам.</param>
+        /// <param name="pdfFilePath">PDF файл хадгалах зам.</param>
         public void GeneratePdfFromReceipt(string textFilePath, string pdfFilePath)
         {
             try
             {
-                // Read the receipt content
+                // Баримтын мөрөөс үүсгэх
                 string receiptContent = File.ReadAllText(textFilePath);
                 string[] lines = receiptContent.Split('\n');
 
-                // Create a bitmap to draw the receipt
+                // Баримтын мөрөөс үүсгэх
                 using (Bitmap bitmap = new Bitmap(500, 800))
                 {
                     using (Graphics graphics = Graphics.FromImage(bitmap))
                     {
-                        // Set up drawing
                         graphics.Clear(Color.White);
                         Font font = new Font("Courier New", 10);
                         float lineHeight = font.GetHeight(graphics);
-                        float yPos = 20; // Start from top with some margin
+                        float yPos = 20; 
                         float leftMargin = 20;
 
-                        // Draw each line
                         foreach (string line in lines)
                         {
                             graphics.DrawString(line, font, Brushes.Black, leftMargin, yPos);
@@ -142,12 +137,9 @@ namespace PosLibrary.Services
                         }
                     }
 
-                    // Save as PDF (using an image format as a simple solution)
-                    // In a production environment, you would use a proper PDF library
                     bitmap.Save(pdfFilePath, ImageFormat.Png);
                 }
 
-                // Rename the file to .pdf extension (this is a workaround)
                 if (File.Exists(pdfFilePath))
                 {
                     string pngPath = pdfFilePath;

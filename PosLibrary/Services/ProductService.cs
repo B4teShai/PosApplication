@@ -138,10 +138,10 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Adds a new category to the system
+        /// Ангиллыг нэмнэ.
         /// </summary>
-        /// <param name="category">The category to add</param>
-        /// <returns>True if successful, false otherwise</returns>
+        /// <param name="category">Ангиллыг нэмэх.</param>
+        /// <returns>Амжилттай эсэхийг буцаана.</returns>
         public async Task<bool> AddCategory(Category category)
         {
             try
@@ -157,10 +157,10 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Updates an existing category in the system
+        /// Ангиллыг шинэчилэх.
         /// </summary>
-        /// <param name="category">The category to update</param>
-        /// <returns>True if successful, false otherwise</returns>
+        /// <param name="category">Ангиллыг шинэчилэх.</param>
+        /// <returns>Амжилттай эсэхийг буцаана.</returns>
         public async Task<bool> UpdateCategory(Category category)
         {
             try
@@ -176,19 +176,18 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Deletes a category from the system
+        /// Ангиллыг устгана.
         /// </summary>
-        /// <param name="categoryId">The ID of the category to delete</param>
-        /// <returns>True if successful, false otherwise</returns>
+        /// <param name="categoryId">Ангиллын ID</param>
+        /// <returns>Амжилттай эсэхийг буцаана.</returns>
         public async Task<bool> DeleteCategory(int categoryId)
         {
             try
             {
-                // Check if any products use this category
                 bool hasProducts = await _context.Products.AnyAsync(p => p.CategoryId == categoryId);
                 if (hasProducts)
                 {
-                    return false; // Can't delete category that's in use
+                    return false;
                 }
 
                 var category = await _context.Categories.FindAsync(categoryId);
@@ -232,10 +231,10 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Gets a product by its ID
+        /// Бүтээгдэхүүнийг ID-ээр татаж авна.
         /// </summary>
-        /// <param name="productId">The product ID to find</param>
-        /// <returns>The product or null if not found</returns>
+        /// <param name="productId">Бүтээгдэхүүн ID-г татаж авна.</param>
+        /// <returns>Бүтээгдэхүүн эсвэл, null.</returns>
         public async Task<Product> GetProductById(int productId)
         {
             return await _context.Products

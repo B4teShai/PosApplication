@@ -19,19 +19,19 @@ namespace PosLibrary.Data
         /// <returns>Асинхрон операцийн тайлбар.</returns>
         public static async Task Initialize(ApplicationDbContext context)
         {
-            // Ensure database is created
+            // Өгөгдлийн сангийн үүсгэн байгаа эсэхийг шалгана.
             await context.Database.EnsureCreatedAsync();
 
-            // Check if we need to seed data
+            // Ангиллын жагсаалт байгаа эсэхийг шалгана.
             if (await context.Categories.AnyAsync())
             {
-                return; // Database already seeded
+                return; // Өгөгдлийн сангид ангиллын жагсаалт байгаа бол дараагийн ангиллын жагсаалтыг үүсгэхгүй.
             }
 
-            // Seed categories first
+            // Ангиллын жагсаалтыг үүсгэж байгаа.
             await SeedCategories(context);
             
-            // Then seed products (which depend on categories)
+            // Бүтээгдэхүүнүүдээ үүсгэж байгаа.
             await SeedProducts(context);
         }
 
@@ -52,12 +52,12 @@ namespace PosLibrary.Data
 
         private static async Task SeedProducts(ApplicationDbContext context)
         {
-            // Get categories that were just seeded
+            // Ангиллын жагсаалтыг үүсгэж байгаа.
             var categories = await context.Categories.ToListAsync();
             if (categories.Count < 4) return;
 
             string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ProductImages");
-            Directory.CreateDirectory(basePath); // Ensure directory exists
+            Directory.CreateDirectory(basePath);
 
             // Жишээ бүтээгдэхүүнүүд
             var products = new List<Product>
@@ -69,7 +69,7 @@ namespace PosLibrary.Data
                     Price = 2.50m, 
                     StockQuantity = 5, 
                     CategoryId = categories[0].Id,
-                    ImagePath = Path.Combine(basePath, "bread.jpg")
+                    ImagePath = Path.Combine(basePath, "ProductImages/bread.jpg")
                 },
                 new Product { 
                     Code = "F002", 
@@ -78,7 +78,7 @@ namespace PosLibrary.Data
                     Price = 3.99m, 
                     StockQuantity = 30, 
                     CategoryId = categories[0].Id,
-                    ImagePath = Path.Combine(basePath, "milk.jpg")
+                    ImagePath = Path.Combine(basePath, "ProductImages/milk.jpg")
                 },
                 new Product { 
                     Code = "B001", 
@@ -87,7 +87,7 @@ namespace PosLibrary.Data
                     Price = 1.99m, 
                     StockQuantity = 100, 
                     CategoryId = categories[1].Id,
-                    ImagePath = Path.Combine(basePath, "cola.jpg")
+                    ImagePath = Path.Combine(basePath, "ProductImages/cola.jpg")
                 },
                 new Product { 
                     Code = "B002", 
@@ -96,7 +96,7 @@ namespace PosLibrary.Data
                     Price = 0.99m, 
                     StockQuantity = 150, 
                     CategoryId = categories[1].Id,
-                    ImagePath = Path.Combine(basePath, "water.jpg")
+                    ImagePath = Path.Combine(basePath, "ProductImages/water.jpg")
                 },
                 new Product { 
                     Code = "S001", 
@@ -105,7 +105,7 @@ namespace PosLibrary.Data
                     Price = 1.50m, 
                     StockQuantity = 75, 
                     CategoryId = categories[2].Id,
-                    ImagePath = Path.Combine(basePath, "chips.jpg")
+                    ImagePath = Path.Combine(basePath, "ProductImages/chips.jpg")
                 },
                 new Product { 
                     Code = "S002", 
@@ -114,7 +114,7 @@ namespace PosLibrary.Data
                     Price = 2.25m, 
                     StockQuantity = 60, 
                     CategoryId = categories[2].Id,
-                    ImagePath = Path.Combine(basePath, "cookies.jpg")
+                    ImagePath = Path.Combine(basePath, "ProductImages/cookies.jpg")
                 },
                 new Product { 
                     Code = "H001", 
@@ -123,7 +123,7 @@ namespace PosLibrary.Data
                     Price = 4.99m, 
                     StockQuantity = 40, 
                     CategoryId = categories[3].Id,
-                    ImagePath = Path.Combine(basePath, "soap.jpg")
+                    ImagePath = Path.Combine(basePath, "ProductImages/soap.jpg")
                 },
                 new Product { 
                     Code = "H002", 
@@ -132,7 +132,7 @@ namespace PosLibrary.Data
                     Price = 8.99m, 
                     StockQuantity = 25, 
                     CategoryId = categories[3].Id,
-                    ImagePath = Path.Combine(basePath, "detergent.jpg")
+                    ImagePath = Path.Combine(basePath, "ProductImages/detergent.jpg")
                 }
             };
 
