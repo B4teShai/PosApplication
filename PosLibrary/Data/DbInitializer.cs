@@ -19,20 +19,32 @@ namespace PosLibrary.Data
         /// <returns>Асинхрон операцийн тайлбар.</returns>
         public static async Task Initialize(ApplicationDbContext context)
         {
-            // Өгөгдлийн сангийн үүсгэн байгаа эсэхийг шалгана.
-            await context.Database.EnsureCreatedAsync();
-
-            // Ангиллын жагсаалт байгаа эсэхийг шалгана.
-            if (await context.Categories.AnyAsync())
+            var created = await context.Database.EnsureCreatedAsync();
+            
+            if (created)
             {
-                return; // Өгөгдлийн сангид ангиллын жагсаалт байгаа бол дараагийн ангиллын жагсаалтыг үүсгэхгүй.
+                Console.WriteLine("Database created for the first time.");
+            }
+            else
+            {
+                Console.WriteLine("Using existing database.");
             }
 
+            if (await context.Categories.AnyAsync())
+            {
+                Console.WriteLine("Database already contains data. Skipping seed data creation.");
+                return;
+            }
+
+            Console.WriteLine("Seeding initial data...");
+            
             // Ангиллын жагсаалтыг үүсгэж байгаа.
             await SeedCategories(context);
             
             // Бүтээгдэхүүнүүдээ үүсгэж байгаа.
             await SeedProducts(context);
+            
+            Console.WriteLine("Initial data seeding completed.");
         }
 
         private static async Task SeedCategories(ApplicationDbContext context)

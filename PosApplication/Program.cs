@@ -22,16 +22,6 @@ namespace PosApplication
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-                   
-            try
-            {
-                CleanupDatabaseFiles();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Warning: Error cleaning up database files: {ex.Message}", 
-                    "Cleanup Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
             
             // Үйлчилгээний тохиргоог хийх
             var services = new ServiceCollection();
@@ -54,7 +44,6 @@ namespace PosApplication
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     
-                    // Always initialize to ensure we have sample images
                     DbInitializer.Initialize(dbContext).GetAwaiter().GetResult();
                 }
             }
