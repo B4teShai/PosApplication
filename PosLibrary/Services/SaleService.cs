@@ -16,7 +16,7 @@ namespace PosLibrary.Services
         /// SaleService классын шинэ жишээг эхлүүлнэ.
         /// </summary>
         /// <param name="context">Борлуулалтын үйлдлийн өгөгдлийн сангийн контекст.</param>
-        /// <param name="productService">Бүтээгдэхүүнийг удирдах үйлчилгээ.</param>
+        /// <param name="productService">Бүтээгдэхүүн удирдах үйлчилгээ.</param>
         public SaleService(ApplicationDbContext context, ProductService productService)
         {
             _context = context;
@@ -42,30 +42,24 @@ namespace PosLibrary.Services
         {
             try
             {
-                using var transaction = await _context.Database.BeginTransactionAsync();
+                bool isInMemory = _context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory";
                 
-                foreach (var item in sale.Items)
+                if (!isInMemory)
                 {
-                    var product = await _context.Products.FindAsync(item.ProductId);
-                    if (product != null)
-                    {
-                        int newStockQuantity = Math.Max(0, product.StockQuantity - item.Quantity);
-                        
-                        // Бүтээгдэхүүн нөөцийн хэмжээг шинэчилэнэ.
-                        product.StockQuantity = newStockQuantity;
-                        _context.Products.Update(product);
-                    }
+                    using var transaction = await _context.Database.BeginTransactionAsync();
+                    
+                    await ProcessSaleItems(sale);
+                    await _context.Sales.AddAsync(sale);
+                    await _context.SaveChangesAsync();
+                    
+                    await transaction.CommitAsync();
                 }
-                
-                // Бүтээгдэхүүнүүдийн нөөцийн хэмжээг шинэчилэнэ.
-                await _context.SaveChangesAsync();
-                
-                // Борлуулалтын төлбөр үүсгэнэ.
-                await _context.Sales.AddAsync(sale);
-                await _context.SaveChangesAsync();
-                
-                // Борлуулалтын төлбөр үүсгэнэ.
-                await transaction.CommitAsync();
+                else
+                {
+                    await ProcessSaleItems(sale);
+                    await _context.Sales.AddAsync(sale);
+                    await _context.SaveChangesAsync();
+                }
                 
                 return sale;
             }
@@ -75,6 +69,29 @@ namespace PosLibrary.Services
                 Console.WriteLine($"Error in CreateSale: {ex.Message}");
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Борлуулалтын барааны мэдээллийг боловсруулж, бүтээгдэхүүний зардлыг шинэчилнэ.
+        /// </summary>
+        /// <param name="sale">Борлуулалт.</param>
+        private async Task ProcessSaleItems(Sale sale)
+        {
+            foreach (var item in sale.Items)
+            {
+                var product = await _context.Products.FindAsync(item.ProductId);
+                if (product != null)
+                {
+                    int newStockQuantity = Math.Max(0, product.StockQuantity - item.Quantity);
+                    
+                    // Бүтээгдэхүүн нөөцийн хэмжээг шинэчилнэ.
+                    product.StockQuantity = newStockQuantity;
+                    _context.Products.Update(product);
+                }
+            }
+            
+            // Бүтээгдэхүүнүүдийн нөөцийн хэмжээг шинэчилнэ.
+            await _context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -145,4 +162,4 @@ namespace PosLibrary.Services
             return sale.AmountPaid - sale.Total;
         }
     }
-} 
+}

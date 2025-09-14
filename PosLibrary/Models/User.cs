@@ -27,14 +27,14 @@ namespace PosLibrary.Models
         /// </summary>
         [Required]
         [StringLength(50)]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         /// <summary>
         /// Хэрэглэгчийн нууц үг.
         /// </summary>
         [Required]
         [StringLength(100)]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
         /// <summary>
         /// Хэрэглэгчийн эрхийг илэрхийлнэ.
@@ -130,4 +130,4 @@ namespace PosLibrary.Models
             return false;
         }
     }
-} 
+}

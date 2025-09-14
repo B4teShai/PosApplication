@@ -38,6 +38,9 @@ namespace PosApplication
             ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
             
+            // Initialize database and create sample images
+            InitializeDatabase();
+            
             // Нэвтрэх форм
             var loginForm = new LoginForm();
             Application.Run(loginForm);
@@ -51,24 +54,14 @@ namespace PosApplication
                 {
                     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     
-                    // Check if database exists
-                    if (!dbContext.Database.CanConnect())
-                    {
-                        try
-                        {
-                            DbInitializer.Initialize(dbContext).GetAwaiter().GetResult();
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Database initialization error: {ex.Message}", 
-                                "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    }
+                    // Always initialize to ensure we have sample images
+                    DbInitializer.Initialize(dbContext).GetAwaiter().GetResult();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Database initialization error: {ex.Message}", 
+                    "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

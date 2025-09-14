@@ -56,8 +56,8 @@ namespace PosLibrary.Data
             var categories = await context.Categories.ToListAsync();
             if (categories.Count < 4) return;
 
-            string basePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ProductImages");
-            Directory.CreateDirectory(basePath);
+            string productImagesPath = @"C:\Users\Dell\Desktop\lesson\windows\Pos\PosApplication\ProductImages";
+            Directory.CreateDirectory(productImagesPath);
 
             // Жишээ бүтээгдэхүүнүүд
             var products = new List<Product>
@@ -67,9 +67,9 @@ namespace PosLibrary.Data
                     Name = "Bread", 
                     Description = "Fresh bread", 
                     Price = 2.50m, 
-                    StockQuantity = 5, 
+                    StockQuantity = 50, 
                     CategoryId = categories[0].Id,
-                    ImagePath = Path.Combine(basePath, "ProductImages/bread.jpg")
+                    ImagePath = Path.Combine(productImagesPath, "bread.jpg")
                 },
                 new Product { 
                     Code = "F002", 
@@ -78,7 +78,7 @@ namespace PosLibrary.Data
                     Price = 3.99m, 
                     StockQuantity = 30, 
                     CategoryId = categories[0].Id,
-                    ImagePath = Path.Combine(basePath, "ProductImages/milk.jpg")
+                    ImagePath = Path.Combine(productImagesPath, "milk.jpg")
                 },
                 new Product { 
                     Code = "B001", 
@@ -87,7 +87,7 @@ namespace PosLibrary.Data
                     Price = 1.99m, 
                     StockQuantity = 100, 
                     CategoryId = categories[1].Id,
-                    ImagePath = Path.Combine(basePath, "ProductImages/cola.jpg")
+                    ImagePath = Path.Combine(productImagesPath, "cola.jpg")
                 },
                 new Product { 
                     Code = "B002", 
@@ -96,7 +96,7 @@ namespace PosLibrary.Data
                     Price = 0.99m, 
                     StockQuantity = 150, 
                     CategoryId = categories[1].Id,
-                    ImagePath = Path.Combine(basePath, "ProductImages/water.jpg")
+                    ImagePath = Path.Combine(productImagesPath, "water.jpg")
                 },
                 new Product { 
                     Code = "S001", 
@@ -105,7 +105,7 @@ namespace PosLibrary.Data
                     Price = 1.50m, 
                     StockQuantity = 75, 
                     CategoryId = categories[2].Id,
-                    ImagePath = Path.Combine(basePath, "ProductImages/chips.jpg")
+                    ImagePath = Path.Combine(productImagesPath, "chips.jpg")
                 },
                 new Product { 
                     Code = "S002", 
@@ -114,7 +114,7 @@ namespace PosLibrary.Data
                     Price = 2.25m, 
                     StockQuantity = 60, 
                     CategoryId = categories[2].Id,
-                    ImagePath = Path.Combine(basePath, "ProductImages/cookies.jpg")
+                    ImagePath = Path.Combine(productImagesPath, "cookies.jpg")
                 },
                 new Product { 
                     Code = "H001", 
@@ -123,7 +123,7 @@ namespace PosLibrary.Data
                     Price = 4.99m, 
                     StockQuantity = 40, 
                     CategoryId = categories[3].Id,
-                    ImagePath = Path.Combine(basePath, "ProductImages/soap.jpg")
+                    ImagePath = Path.Combine(productImagesPath, "soap.jpg")
                 },
                 new Product { 
                     Code = "H002", 
@@ -132,7 +132,7 @@ namespace PosLibrary.Data
                     Price = 8.99m, 
                     StockQuantity = 25, 
                     CategoryId = categories[3].Id,
-                    ImagePath = Path.Combine(basePath, "ProductImages/detergent.jpg")
+                    ImagePath = Path.Combine(productImagesPath, "detergent.jpg")
                 }
             };
 
@@ -140,4 +140,4 @@ namespace PosLibrary.Data
             await context.SaveChangesAsync();
         }
     }
-} 
+}

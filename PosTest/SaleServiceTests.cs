@@ -6,6 +6,7 @@ using PosLibrary.Data;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace PosTest
 {
@@ -55,20 +56,20 @@ namespace PosTest
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
-            var user = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = "Cashier" };
+            var user = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = UserRole.Cashier1 };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
             var sale = new Sale
             {
-                Date = DateTime.Now,
-                TotalAmount = 10.99m,
+                CreatedAt = DateTime.Now,
+                Total = 10.99m,
                 AmountPaid = 20.00m,
                 Change = 9.01m,
                 UserId = user.Id,
                 Items = new List<SaleItem>
                 {
-                    new SaleItem { ProductId = product.Id, Quantity = 1, UnitPrice = 10.99m }
+                    new SaleItem { ProductId = product.Id, Quantity = 1, UnitPrice = 10.99m, Subtotal = 10.99m }
                 }
             };
 
@@ -96,20 +97,20 @@ namespace PosTest
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
-            var user = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = "Cashier" };
+            var user = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = UserRole.Cashier1 };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
             var sale = new Sale
             {
-                Date = DateTime.Now,
-                TotalAmount = 10.99m,
+                CreatedAt = DateTime.Now,
+                Total = 10.99m,
                 AmountPaid = 20.00m,
                 Change = 9.01m,
                 UserId = user.Id,
                 Items = new List<SaleItem>
                 {
-                    new SaleItem { ProductId = product.Id, Quantity = 1, UnitPrice = 10.99m }
+                    new SaleItem { ProductId = product.Id, Quantity = 1, UnitPrice = 10.99m, Subtotal = 10.99m }
                 }
             };
             
@@ -124,7 +125,7 @@ namespace PosTest
         }
 
         /// <summary>
-        /// Хүчинтэй бус борлуулалтын ID-аар хайхад null утга буцаах ёстой.
+        /// Хүчинтэй бус борлуулалтын ID-аар хайхад null утга буцаах ёсты.
         /// </summary>
         [TestMethod]
         public async Task GetSaleById_WithInvalidId_ShouldReturnNull()
@@ -148,7 +149,7 @@ namespace PosTest
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
 
-            var user = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = "Cashier" };
+            var user = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = UserRole.Cashier1 };
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
 
@@ -157,26 +158,26 @@ namespace PosTest
             {
                 new Sale
                 {
-                    Date = today,
-                    TotalAmount = 10.99m,
+                    CreatedAt = today,
+                    Total = 10.99m,
                     AmountPaid = 20.00m,
                     Change = 9.01m,
                     UserId = user.Id,
                     Items = new List<SaleItem>
                     {
-                        new SaleItem { ProductId = product.Id, Quantity = 1, UnitPrice = 10.99m }
+                        new SaleItem { ProductId = product.Id, Quantity = 1, UnitPrice = 10.99m, Subtotal = 10.99m }
                     }
                 },
                 new Sale
                 {
-                    Date = today.AddDays(-1),
-                    TotalAmount = 21.98m,
+                    CreatedAt = today.AddDays(-1),
+                    Total = 21.98m,
                     AmountPaid = 25.00m,
                     Change = 3.02m,
                     UserId = user.Id,
                     Items = new List<SaleItem>
                     {
-                        new SaleItem { ProductId = product.Id, Quantity = 2, UnitPrice = 10.99m }
+                        new SaleItem { ProductId = product.Id, Quantity = 2, UnitPrice = 10.99m, Subtotal = 21.98m }
                     }
                 }
             };
@@ -188,7 +189,7 @@ namespace PosTest
 
             Assert.IsNotNull(result);
             Assert.AreEqual(1, result.Count);
-            Assert.AreEqual(today.Date, result[0].Date.Date);
+            Assert.AreEqual(today.Date, result[0].CreatedAt.Date);
         }
 
         /// <summary>
@@ -201,8 +202,8 @@ namespace PosTest
             {
                 Items = new List<SaleItem>
                 {
-                    new SaleItem { Quantity = 2, UnitPrice = 10.99m },
-                    new SaleItem { Quantity = 3, UnitPrice = 5.99m }
+                    new SaleItem { Quantity = 2, UnitPrice = 10.99m, Subtotal = 21.98m },
+                    new SaleItem { Quantity = 3, UnitPrice = 5.99m, Subtotal = 17.97m }
                 }
             };
 
@@ -219,7 +220,7 @@ namespace PosTest
         {
             var sale = new Sale
             {
-                TotalAmount = 25.00m,
+                Total = 25.00m,
                 AmountPaid = 30.00m
             };
 
@@ -228,4 +229,4 @@ namespace PosTest
             Assert.AreEqual(5.00m, result);
         }
     }
-} 
+}

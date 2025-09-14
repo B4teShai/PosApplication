@@ -14,7 +14,7 @@ namespace PosLibrary.Services
         /// <summary>
         /// ProductService классын шинэ жишээг эхлүүлнэ.
         /// </summary>
-        /// <param name="context">Бүтээгдэхүүний үйлдлийн өгөгдлийн сангийн контекст.</param>
+        /// <param name="context">Бүтээгдэхмийн үйлдлийн өгөгдлийн сангийн контекст.</param>
         public ProductService(ApplicationDbContext context)
         {
             _context = context;
@@ -235,7 +235,7 @@ namespace PosLibrary.Services
         /// </summary>
         /// <param name="productId">Бүтээгдэхүүн ID-г татаж авна.</param>
         /// <returns>Бүтээгдэхүүн эсвэл, null.</returns>
-        public async Task<Product> GetProductById(int productId)
+        public async Task<Product?> GetProductById(int productId)
         {
             return await _context.Products
                 .Include(p => p.Category)

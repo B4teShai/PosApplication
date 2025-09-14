@@ -3,28 +3,18 @@ using System.Windows.Forms;
 using PosLibrary.Models;
 using PosLibrary.Services;
 using PosLibrary.Data;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.IO;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 using System.Drawing.Drawing2D;
 
 namespace PosApplication
 {
     public partial class MainForm : Form
     {
-        private readonly UserService _userService;
-        private readonly ReceiptService _receiptService;
-        private readonly PosLibrary.Models.UserRole _userRole;
         private User _currentUser;
         private decimal _currentTotal = 0;
         private int? _selectedCategoryId = null;
-        private string currentCategory = "All";
-        private List<PosLibrary.Models.Product> products = new List<PosLibrary.Models.Product>();
-        private List<PosLibrary.Models.Product> filteredProducts = new List<PosLibrary.Models.Product>();
+        private List<Product> products = new List<Product>();
+        private List<Product> filteredProducts = new List<Product>();
         private Cart _currentCart;
         private List<Category> categories = new List<Category>();
         private Dictionary<int, Button> categoryButtons = new Dictionary<int, Button>();
@@ -40,7 +30,7 @@ namespace PosApplication
             // Одоогийн хэрэглэгчийн мэдээллийг хадгалах
             _currentUser = user;
             
-            // Жагсаалтуудыг анхны тохиргоогоор үүсгэх
+            // Жагсаалтуудыг анхны тохиргоотой үүсгэх
             categories = new List<Category>();
             categoryButtons = new Dictionary<int, Button>();
             
@@ -93,45 +83,6 @@ namespace PosApplication
             }
         }
 
-        private void SetDefaultUser()
-        {
-            try
-            {
-                // Эрхэнд тохируулан анхны хэрэглэгчийн мэдээллийг үүсгэх
-                switch (_userRole)
-                {
-                    case PosLibrary.Models.UserRole.Manager:
-                        _currentUser = new Manager { Username = "manager", FullName = "Системийн удирдагч" };
-                        break;
-                    case PosLibrary.Models.UserRole.Cashier1:
-                        _currentUser = new Cashier { Username = "cashier1", FullName = "Кассчин 1" };
-                        break;
-                    case PosLibrary.Models.UserRole.Cashier2:
-                        _currentUser = new Cashier { Username = "cashier2", FullName = "Кассчин 2" };
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Хэрэглэгчийн мэдээлэл тохируулахад алдаа гарлаа: {ex.Message}",
-                    "Нэвтрэх алдаа", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        private void SetupRoleBasedAccess()
-        {
-            this.Text = $"POS Систем - {_userRole}";
-            if (_userRole == PosLibrary.Models.UserRole.Cashier1 || _userRole == PosLibrary.Models.UserRole.Cashier2)
-            {
-                menuCategory.Visible = false;
-            }
-
-            if (_userRole == PosLibrary.Models.UserRole.Manager)
-            {
-                lvProducts.MouseClick += LvProducts_MouseClick;
-            }
-        }
-
         private async void LoadProducts(int? categoryId = null, string searchTerm = null)
         {
             try
@@ -162,6 +113,7 @@ namespace PosApplication
                     lvProducts.LargeImageList.ImageSize = new Size(160, 160);
                     lvProducts.LargeImageList.ColorDepth = ColorDepth.Depth32Bit;
                 }
+ 
                 else
                 {
                     lvProducts.LargeImageList.Images.Clear();
@@ -170,36 +122,81 @@ namespace PosApplication
                 // Бүтээгдэхүүнүүдийг ListView-д нэмэх
                 foreach (var product in products)
                 {
-                    Bitmap productImage;
+                    Bitmap productImage = null;
+                    bool imageLoaded = false;
                     
-                    if (!string.IsNullOrEmpty(product.ImagePath) && File.Exists(product.ImagePath))
+                    // Try to load actual product image only
+                    if (!string.IsNullOrEmpty(product.ImagePath))
                     {
-                        try 
+                        // Check if absolute path exists
+                        if (File.Exists(product.ImagePath))
                         {
-                            using (var img = Image.FromFile(product.ImagePath))
+                            try 
                             {
-                                productImage = new Bitmap(img);
+                                using (var originalImg = Image.FromFile(product.ImagePath))
+                                {
+                                    productImage = CreateProductImageDisplay(originalImg, product);
+                                    imageLoaded = true;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error loading image {product.ImagePath}: {ex.Message}");
                             }
                         }
-                        catch
+                        else
                         {
-                            productImage = CreateProductImage(product);
+                            // Try different possible paths
+                            string[] possiblePaths = {
+                                Path.Combine(Application.StartupPath, "ProductImages", Path.GetFileName(product.ImagePath)),
+                                Path.Combine(Application.StartupPath, Path.GetFileName(product.ImagePath)),
+                                Path.Combine(Directory.GetCurrentDirectory(), "ProductImages", Path.GetFileName(product.ImagePath)),
+                                Path.Combine(Environment.CurrentDirectory, "ProductImages", Path.GetFileName(product.ImagePath))
+                            };
+                            
+                            foreach (string testPath in possiblePaths)
+                            {
+                                if (File.Exists(testPath))
+                                {
+                                    try
+                                    {
+                                        using (var originalImg = Image.FromFile(testPath))
+                                        {
+                                            productImage = CreateProductImageDisplay(originalImg, product);
+                                            imageLoaded = true;
+                                            // Update the product's image path to the working one
+                                            product.ImagePath = testPath;
+                                            break;
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        Console.WriteLine($"Error loading image {testPath}: {ex.Message}");
+                                    }
+                                }
+                            }
                         }
                     }
-                    else
+                    
+                    // If no image is found, create a simple placeholder with product info
+                    if (productImage == null)
                     {
-                        productImage = CreateProductImage(product);
+                        productImage = CreatePlaceholderImage(product);
+                        imageLoaded = false;
                     }
                     
-                    lvProducts.LargeImageList.Images.Add(product.Id.ToString(), productImage);
-                    
-                    var item = new ListViewItem();
-                    item.Text = product.Name; 
-                    item.ImageKey = product.Id.ToString();
-                    item.Tag = product;
-                    item.ToolTipText = $"Name: {product.Name}\nPrice: ${product.Price:F2}\nStock: {product.StockQuantity}";
-                    
-                    lvProducts.Items.Add(item);
+                    if (productImage != null)
+                    {
+                        lvProducts.LargeImageList.Images.Add(product.Id.ToString(), productImage);
+                        
+                        var item = new ListViewItem();
+                        item.Text = product.Name; 
+                        item.ImageKey = product.Id.ToString();
+                        item.Tag = product;
+                        item.ToolTipText = $"Name: {product.Name}\nPrice: ${product.Price:F2}\nStock: {product.StockQuantity}\nImage: {(imageLoaded ? "Product Image" : "No Image - Add via Edit")}";
+                        
+                        lvProducts.Items.Add(item);
+                    }
                 }
             }
             catch (Exception ex)
@@ -208,157 +205,140 @@ namespace PosApplication
             }
         }
 
-        private Bitmap CreateProductImage(Product product)
+        private Bitmap CreateProductImageDisplay(Image originalImg, Product product)
         {
-            Bitmap bmp = new Bitmap(160, 160);
-            using (Graphics g = Graphics.FromImage(bmp))
+            Bitmap productImage = new Bitmap(160, 160);
+            using (Graphics g = Graphics.FromImage(productImage))
             {
-                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.SmoothingMode = SmoothingMode.HighQuality;
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 
-                using (LinearGradientBrush brush = new LinearGradientBrush(
-                    new Rectangle(0, 0, bmp.Width, bmp.Height),
-                    Color.FromArgb(250, 250, 255),
-                    Color.FromArgb(235, 235, 245),
-                    45f))
+                g.DrawImage(originalImg, 0, 0, 160, 160);
+                
+                using (Pen borderPen = new Pen(Color.FromArgb(150, 200, 200, 200), 2))
                 {
-                    g.FillRectangle(brush, 0, 0, bmp.Width, bmp.Height);
+                    g.DrawRectangle(borderPen, 1, 1, 158, 158);
                 }
                 
-                Rectangle borderRect = new Rectangle(1, 1, bmp.Width - 3, bmp.Height - 3);
-                using (GraphicsPath borderPath = CreateRoundedRectangle(borderRect, 8))
-                using (Pen pen = new Pen(Color.FromArgb(180, 180, 220), 2))
+                Rectangle overlayRect = new Rectangle(0, 120, 160, 40);
+                using (SolidBrush overlayBrush = new SolidBrush(Color.FromArgb(160, 0, 0, 0)))
                 {
-                    g.DrawPath(pen, borderPath);
+                    g.FillRectangle(overlayBrush, overlayRect);
                 }
                 
-                Rectangle shadowRect = new Rectangle(3, 3, bmp.Width - 7, bmp.Height - 7);
-                using (GraphicsPath shadowPath = CreateRoundedRectangle(shadowRect, 7))
-                using (PathGradientBrush shadowBrush = new PathGradientBrush(shadowPath))
+                using (Font nameFont = new Font("Segoe UI", 9, FontStyle.Bold))
+                using (SolidBrush textBrush = new SolidBrush(Color.White))
                 {
-                    shadowBrush.CenterColor = Color.FromArgb(0, 0, 0, 0);
-                    shadowBrush.SurroundColors = new Color[] { Color.FromArgb(20, 0, 0, 0) };
-                    g.FillPath(shadowBrush, shadowPath);
-                }
-                
-                using (Font codeFont = new Font("Segoe UI", 9, FontStyle.Italic))
-                using (SolidBrush codeBrush = new SolidBrush(Color.FromArgb(130, 130, 150)))
-                {
-                    g.DrawString(product.Code, codeFont, codeBrush, new PointF(10, 10));
-                }
-                
-                Rectangle nameBox = new Rectangle(10, 28, bmp.Width - 20, 48);
-                using (GraphicsPath namePath = CreateRoundedRectangle(nameBox, 6))
-                using (LinearGradientBrush nameBgBrush = new LinearGradientBrush(
-                    nameBox,
-                    Color.FromArgb(120, 160, 220),
-                    Color.FromArgb(90, 130, 200),
-                    90f))
-                {
-                    g.FillPath(nameBgBrush, namePath);
-                    
-                    using (LinearGradientBrush highlightBrush = new LinearGradientBrush(
-                        new Rectangle(nameBox.X, nameBox.Y, nameBox.Width, 6),
-                        Color.FromArgb(60, 255, 255, 255),
-                        Color.FromArgb(0, 255, 255, 255),
-                        90f))
+                    StringFormat format = new StringFormat
                     {
-                        g.FillRectangle(highlightBrush, nameBox.X + 2, nameBox.Y + 1, nameBox.Width - 4, 5);
-                    }
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center,
+                        Trimming = StringTrimming.EllipsisCharacter
+                    };
+                    g.DrawString(product.Name, nameFont, textBrush, overlayRect, format);
                 }
                 
-                using (Font nameFont = new Font("Segoe UI", 12, FontStyle.Bold))
+                using (Font priceFont = new Font("Segoe UI", 8, FontStyle.Bold))
+                using (SolidBrush priceBgBrush = new SolidBrush(Color.FromArgb(200, 0, 120, 0)))
+                using (SolidBrush priceBrush = new SolidBrush(Color.White))
                 {
-                    StringFormat nameFormat = new StringFormat();
-                    nameFormat.Alignment = StringAlignment.Center;
-                    nameFormat.LineAlignment = StringAlignment.Center;
-                    nameFormat.Trimming = StringTrimming.EllipsisCharacter;
+                    string priceText = $"${product.Price:F2}";
+                    SizeF priceSize = g.MeasureString(priceText, priceFont);
+                    Rectangle priceBg = new Rectangle(160 - (int)priceSize.Width - 8, 5, (int)priceSize.Width + 6, (int)priceSize.Height + 2);
                     
-                    // Draw shadow
-                    using (SolidBrush shadowBrush = new SolidBrush(Color.FromArgb(80, 0, 0, 0)))
-                    {
-                        g.DrawString(product.Name, nameFont, shadowBrush, new RectangleF(nameBox.X + 2, nameBox.Y + 2, nameBox.Width, nameBox.Height), nameFormat);
-                    }
-                    
-                    // Draw text
-                    using (SolidBrush nameBrush = new SolidBrush(Color.White))
-                    {
-                        g.DrawString(product.Name, nameFont, nameBrush, nameBox, nameFormat);
-                    }
-                }
-
-                Rectangle priceBox = new Rectangle(20, 90, bmp.Width - 40, 30);
-                using (GraphicsPath pricePath = CreateRoundedRectangle(priceBox, 5))
-                using (LinearGradientBrush priceBgBrush = new LinearGradientBrush(
-                    priceBox,
-                    Color.FromArgb(245, 245, 245),
-                    Color.FromArgb(230, 230, 235),
-                    90f))
-                {
-                    g.FillPath(priceBgBrush, pricePath);
-                    
-                    using (Pen priceBorderPen = new Pen(Color.FromArgb(190, 190, 200), 1))
-                    {
-                        g.DrawPath(priceBorderPen, pricePath);
-                    }
+                    g.FillRectangle(priceBgBrush, priceBg);
+                    g.DrawString(priceText, priceFont, priceBrush, priceBg.X + 3, priceBg.Y + 1);
                 }
                 
-                using (Font priceFont = new Font("Segoe UI", 14, FontStyle.Bold))
-                using (SolidBrush priceBrush = new SolidBrush(Color.FromArgb(20, 110, 20)))
-                {
-                    StringFormat priceFormat = new StringFormat();
-                    priceFormat.Alignment = StringAlignment.Center;
-                    priceFormat.LineAlignment = StringAlignment.Center;
-                    
-                    g.DrawString($"${product.Price:F2}", priceFont, priceBrush, priceBox, priceFormat);
-                }
-                
-                int stockIndicatorSize = 12;
+                // Add stock indicator
                 Color stockColor = product.StockQuantity > 10 ? Color.FromArgb(0, 160, 0) : 
                                   product.StockQuantity > 0 ? Color.FromArgb(240, 150, 0) : 
                                   Color.FromArgb(200, 40, 40);
                 
-                Rectangle stockIndicatorRect = new Rectangle(15, 130, stockIndicatorSize, stockIndicatorSize);
-                using (GraphicsPath stockPath = new GraphicsPath())
+                using (SolidBrush stockBrush = new SolidBrush(Color.FromArgb(200, stockColor)))
                 {
-                    stockPath.AddEllipse(stockIndicatorRect);
-                    
-                    using (PathGradientBrush stockBrush = new PathGradientBrush(stockPath))
-                    {
-                        Color centerColor = Color.FromArgb(255, stockColor);
-                        Color[] surroundColors = { Color.FromArgb(200, stockColor) };
-                        
-                        stockBrush.CenterColor = centerColor;
-                        stockBrush.SurroundColors = surroundColors;
-                        
-                        g.FillPath(stockBrush, stockPath);
-                    }
-                    
-                    using (GraphicsPath highlightPath = new GraphicsPath())
-                    {
-                        highlightPath.AddEllipse(new Rectangle(stockIndicatorRect.X + 2, stockIndicatorRect.Y + 2, 
-                                                stockIndicatorRect.Width / 2, stockIndicatorRect.Height / 2));
-                        using (SolidBrush highlightBrush = new SolidBrush(Color.FromArgb(120, 255, 255, 255)))
-                        {
-                            g.FillPath(highlightBrush, highlightPath);
-                        }
-                    }
-                }
-                
-                using (Font stockFont = new Font("Segoe UI", 9))
-                using (SolidBrush stockTextBrush = new SolidBrush(Color.FromArgb(70, 70, 80)))
-                {
-                    string stockText = product.StockQuantity > 10 ? $"In Stock ({product.StockQuantity})" : 
-                                      product.StockQuantity > 0 ? $"Low Stock ({product.StockQuantity})" : 
-                                      "Out of Stock";
-                    g.DrawString(stockText, stockFont, stockTextBrush, new PointF(30, 130));
+                    g.FillEllipse(stockBrush, 8, 8, 10, 10);
                 }
             }
             
-            return bmp;
+            return productImage;
         }
-
+        private Bitmap CreatePlaceholderImage(Product product)
+        {
+            Bitmap placeholderImage = new Bitmap(160, 160);
+            using (Graphics g = Graphics.FromImage(placeholderImage))
+            {
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                
+                // Create gradient background
+                using (LinearGradientBrush brush = new LinearGradientBrush(
+                    new Rectangle(0, 0, 160, 160),
+                    Color.FromArgb(245, 245, 250),
+                    Color.FromArgb(230, 230, 240),
+                    LinearGradientMode.Vertical))
+                {
+                    g.FillRectangle(brush, 0, 0, 160, 160);
+                }
+                
+                // Add border
+                using (Pen borderPen = new Pen(Color.FromArgb(200, 200, 210), 2))
+                {
+                    g.DrawRectangle(borderPen, 1, 1, 158, 158);
+                }
+                
+                // Add "No Image" text in center
+                using (Font font = new Font("Segoe UI", 10, FontStyle.Bold))
+                using (SolidBrush textBrush = new SolidBrush(Color.FromArgb(150, 150, 160)))
+                {
+                    StringFormat format = new StringFormat
+                    {
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center
+                    };
+                    g.DrawString("No Image\nAdd via Edit", font, textBrush, new Rectangle(10, 50, 140, 60), format);
+                }
+                
+                // Add product name at bottom
+                using (Font nameFont = new Font("Segoe UI", 9, FontStyle.Bold))
+                using (SolidBrush nameBrush = new SolidBrush(Color.FromArgb(80, 80, 100)))
+                {
+                    StringFormat format = new StringFormat
+                    {
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center,
+                        Trimming = StringTrimming.EllipsisCharacter
+                    };
+                    g.DrawString(product.Name, nameFont, nameBrush, new Rectangle(5, 120, 150, 35), format);
+                }
+                
+                // Add price in top-right corner
+                using (Font priceFont = new Font("Segoe UI", 8, FontStyle.Bold))
+                using (SolidBrush priceBgBrush = new SolidBrush(Color.FromArgb(200, 0, 120, 0)))
+                using (SolidBrush priceBrush = new SolidBrush(Color.White))
+                {
+                    string priceText = $"${product.Price:F2}";
+                    SizeF priceSize = g.MeasureString(priceText, priceFont);
+                    Rectangle priceBg = new Rectangle(160 - (int)priceSize.Width - 8, 5, (int)priceSize.Width + 6, (int)priceSize.Height + 2);
+                    
+                    g.FillRectangle(priceBgBrush, priceBg);
+                    g.DrawString(priceText, priceFont, priceBrush, priceBg.X + 3, priceBg.Y + 1);
+                }
+                
+                // Add stock indicator
+                Color stockColor = product.StockQuantity > 10 ? Color.FromArgb(0, 160, 0) : 
+                                  product.StockQuantity > 0 ? Color.FromArgb(240, 150, 0) : 
+                                  Color.FromArgb(200, 40, 40);
+                
+                using (SolidBrush stockBrush = new SolidBrush(Color.FromArgb(200, stockColor)))
+                {
+                    g.FillEllipse(stockBrush, 8, 8, 10, 10);
+                }
+            }
+            
+            return placeholderImage;
+        }
+        
         private void LvProducts_DrawItem(object sender, DrawListViewItemEventArgs e)
         {
             e.DrawDefault = false;
@@ -869,7 +849,7 @@ namespace PosApplication
             }
         }
 
-        private async void DeleteProduct(PosLibrary.Models.Product product)
+        private async void DeleteProduct(Product product)
         {
             if (product == null)
                 return;
@@ -1361,4 +1341,4 @@ namespace PosApplication
             return path;
         }
     }
-} 
+}

@@ -5,9 +5,12 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+
+#if WINDOWS
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Drawing.Imaging;
+#endif
 
 namespace PosLibrary.Services
 {
@@ -28,7 +31,7 @@ namespace PosLibrary.Services
         }
 
         /// <summary>
-        /// Сагсын баримтыг үүсгэнэ.
+        /// Сагсны баримтыг үүсгэнэ.
         /// </summary>
         /// <param name="cart">Баримт үүсгэх сагс.</param>
         /// <returns>Форматтай баримтын мөр.</returns>
@@ -113,6 +116,7 @@ namespace PosLibrary.Services
         /// <param name="pdfFilePath">PDF файл хадгалах зам.</param>
         public void GeneratePdfFromReceipt(string textFilePath, string pdfFilePath)
         {
+#if WINDOWS
             try
             {
                 // Баримтын мөрөөс үүсгэх
@@ -151,6 +155,9 @@ namespace PosLibrary.Services
             {
                 throw new Exception($"Error generating PDF: {ex.Message}", ex);
             }
+#else
+            throw new PlatformNotSupportedException("PDF generation is only supported on Windows platform.");
+#endif
         }
         
         /// <summary>
@@ -165,4 +172,4 @@ namespace PosLibrary.Services
             return fileName;
         }
     }
-} 
+}

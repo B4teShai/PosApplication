@@ -53,7 +53,7 @@ namespace PosLibrary.Models
         /// <summary>
         /// Хэрэглэгч.
         /// </summary>
-        public User User { get; set; }
+        public User? User { get; set; }
 
         /// <summary>
         /// Худалдсан бүтээгдэхүүнүүд.
@@ -79,7 +79,7 @@ namespace PosLibrary.Models
         /// <summary>
         /// Борлуулалт.
         /// </summary>
-        public Sale Sale { get; set; }
+        public Sale? Sale { get; set; }
 
         /// <summary>
         /// Бүтээгдэхүүн ID.
@@ -89,7 +89,7 @@ namespace PosLibrary.Models
         /// <summary>
         /// Бүтээгдэхүүн.
         /// </summary>
-        public Product Product { get; set; }
+        public Product? Product { get; set; }
 
         /// <summary>
         /// Бүтээгдэхүүн нэр.

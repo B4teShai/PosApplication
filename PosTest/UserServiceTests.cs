@@ -158,9 +158,9 @@ namespace PosTest
 
             var users = await _context.Users.ToListAsync();
             Assert.AreEqual(3, users.Count);
-            Assert.IsTrue(users.Any(u => u.Username == "Manager"));
-            Assert.IsTrue(users.Any(u => u.Username == "Cashier1"));
-            Assert.IsTrue(users.Any(u => u.Username == "Cashier2"));
+            Assert.IsTrue(users.Any(u => u.Username == "manager"));
+            Assert.IsTrue(users.Any(u => u.Username == "cashier1"));
+            Assert.IsTrue(users.Any(u => u.Username == "cashier2"));
         }
     }
-} 
+}

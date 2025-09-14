@@ -32,19 +32,20 @@ namespace PosTest
             _testSale = new Sale
             {
                 Id = 1,
-                Date = DateTime.Now,
-                User = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = "Cashier" },
+                CreatedAt = DateTime.Now,
+                User = new Cashier { Username = "TestCashier", Password = "TestPassword", Role = UserRole.Cashier1 },
                 Items = new List<SaleItem>
                 {
                     new SaleItem
                     {
                         Product = new Product { Name = "Test Product", Code = "TP001" },
+                        ProductName = "Test Product",
                         Quantity = 2,
                         UnitPrice = 10.99m,
-                        TotalPrice = 21.98m
+                        Subtotal = 21.98m
                     }
                 },
-                TotalAmount = 21.98m,
+                Total = 21.98m,
                 AmountPaid = 25.00m,
                 Change = 3.02m
             };
@@ -103,4 +104,4 @@ namespace PosTest
             Assert.IsTrue(receipt.Contains("POS SYSTEM RECEIPT"));
         }
     }
-} 
+}

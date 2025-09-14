@@ -23,7 +23,7 @@ namespace PosLibrary.Models
         /// <summary>       
         /// Хэрэглэгч.
         /// </summary>
-        public User User { get; set; }
+        public User? User { get; set; }
 
         /// <summary>
         /// Цэс.
@@ -74,7 +74,7 @@ namespace PosLibrary.Models
         /// <summary>
         /// Сагс.
         /// </summary>
-        public Cart Cart { get; set; }
+        public Cart? Cart { get; set; }
         
         /// <summary>
         /// Бараа ID.
@@ -84,7 +84,7 @@ namespace PosLibrary.Models
         /// <summary>
         /// Бараа.
         /// </summary>
-        public Product Product { get; set; }
+        public Product? Product { get; set; }
         
         /// <summary>
         /// Барааны нэр.

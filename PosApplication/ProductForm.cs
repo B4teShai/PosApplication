@@ -75,17 +75,43 @@ namespace PosApplication
                 cmbCategory.SelectedValue = _product.CategoryId;
             }
 
-            if (!string.IsNullOrEmpty(_product.ImagePath) && File.Exists(_product.ImagePath))
+            // Load existing product image
+            if (!string.IsNullOrEmpty(_product.ImagePath))
             {
-                try
+                _selectedImagePath = _product.ImagePath;
+                
+                // Try to load the image from various possible paths
+                string[] possiblePaths = {
+                    _product.ImagePath,
+                    Path.Combine(Application.StartupPath, "ProductImages", Path.GetFileName(_product.ImagePath)),
+                    Path.Combine(Application.StartupPath, Path.GetFileName(_product.ImagePath)),
+                    Path.Combine(Directory.GetCurrentDirectory(), "ProductImages", Path.GetFileName(_product.ImagePath))
+                };
+                
+                bool imageLoaded = false;
+                foreach (string testPath in possiblePaths)
                 {
-                    _selectedImagePath = _product.ImagePath;
-                    pictureBox.Image = Image.FromFile(_product.ImagePath);
-                    pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+                    if (File.Exists(testPath))
+                    {
+                        try
+                        {
+                            pictureBox.Image = Image.FromFile(testPath);
+                            pictureBox.SizeMode = PictureBoxSizeMode.Zoom;
+                            _selectedImagePath = testPath; // Update to working path
+                            imageLoaded = true;
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Error loading image {testPath}: {ex.Message}");
+                        }
+                    }
                 }
-                catch
+                
+                if (!imageLoaded)
                 {
                     pictureBox.Image = null;
+                    _selectedImagePath = null;
                 }
             }
         }
@@ -107,24 +133,33 @@ namespace PosApplication
                     
                     if (!string.IsNullOrEmpty(_selectedImagePath))
                     {
-                        // Copy image to application folder if it's not already there
+                        // Ensure ProductImages directory exists in application directory
                         string targetDir = Path.Combine(Application.StartupPath, "ProductImages");
                         if (!Directory.Exists(targetDir))
                         {
                             Directory.CreateDirectory(targetDir);
                         }
 
-                        string targetPath = Path.Combine(targetDir, $"product_{_product.Code}_{Path.GetFileName(_selectedImagePath)}");
-                        if (_selectedImagePath != targetPath)
+                        string fileExtension = Path.GetExtension(_selectedImagePath);
+                        string fileName = $"product_{_product.Code}_{DateTime.Now:yyyyMMdd_HHmmss}{fileExtension}";
+                        string targetPath = Path.Combine(targetDir, fileName);
+                        
+                        // Copy image to ProductImages folder if it's not already there
+                        if (!_selectedImagePath.StartsWith(targetDir))
                         {
                             File.Copy(_selectedImagePath, targetPath, true);
+                            _product.ImagePath = targetPath;
                         }
-                        _product.ImagePath = targetPath;
+                        else
+                        {
+                            _product.ImagePath = _selectedImagePath;
+                        }
                     }
 
                     bool success;
                     if (_isEditMode)
                     {
+                        _product.UpdatedAt = DateTime.Now;
                         success = await _productService.UpdateProduct(_product);
                     }
                     else
@@ -216,4 +251,4 @@ namespace PosApplication
             return true;
         }
     }
-} 
+}
