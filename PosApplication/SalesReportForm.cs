@@ -36,15 +36,15 @@ namespace PosApplication
 
             // Date range controls
             var lblStartDate = new Label { Text = "Start Date:", Location = new Point(20, 20) };
-            dtpStartDate = new DateTimePicker 
-            { 
+            dtpStartDate = new DateTimePicker
+            {
                 Location = new Point(100, 20),
                 Format = DateTimePickerFormat.Short
             };
 
             var lblEndDate = new Label { Text = "End Date:", Location = new Point(300, 20) };
-            dtpEndDate = new DateTimePicker 
-            { 
+            dtpEndDate = new DateTimePicker
+            {
                 Location = new Point(380, 20),
                 Format = DateTimePickerFormat.Short
             };
@@ -62,15 +62,15 @@ namespace PosApplication
             };
 
             // Summary labels
-            lblTotalSales = new Label 
-            { 
+            lblTotalSales = new Label
+            {
                 Text = "Total Sales: $0.00",
                 Location = new Point(20, 480),
                 Font = new Font(this.Font, FontStyle.Bold)
             };
 
-            lblTotalItems = new Label 
-            { 
+            lblTotalItems = new Label
+            {
                 Text = "Total Items Sold: 0",
                 Location = new Point(20, 510),
                 Font = new Font(this.Font, FontStyle.Bold)
@@ -94,9 +94,9 @@ namespace PosApplication
             btnExport.Click += BtnExport_Click;
 
             // Add controls to form
-            this.Controls.AddRange(new Control[] 
-            { 
-                lblStartDate, dtpStartDate, 
+            this.Controls.AddRange(new Control[]
+            {
+                lblStartDate, dtpStartDate,
                 lblEndDate, dtpEndDate,
                 dgvSales, lblTotalSales, lblTotalItems,
                 btnGenerate, btnExport
@@ -109,7 +109,7 @@ namespace PosApplication
             var endDate = dtpEndDate.Value.Date.AddDays(1).AddSeconds(-1);
 
             var sales = _saleService.GetSalesByDateRange(startDate, endDate);
-            
+
             dgvSales.DataSource = sales.Select(s => new
             {
                 s.Id,
@@ -146,10 +146,10 @@ namespace PosApplication
                     {
                         var sales = (IEnumerable<dynamic>)dgvSales.DataSource;
                         var lines = new List<string>();
-                        
+
                         // Add headers
                         lines.Add("ID,Date,Items,Total,Cashier");
-                        
+
                         // Add data
                         foreach (var sale in sales)
                         {

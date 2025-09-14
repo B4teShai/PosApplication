@@ -28,10 +28,17 @@ namespace PosApplication
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1000, 600);
-            this.Text = "Sales Report";
+            SuspendLayout();
+            // 
+            // SalesReportForm
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1000, 600);
+            Name = "SalesReportForm";
+            Text = "Sales Report";
+            Load += SalesReportForm_Load;
+            ResumeLayout(false);
         }
 
         #endregion

@@ -28,7 +28,7 @@ namespace PosApplication
                 lstCategories.DataSource = categories;
                 lstCategories.DisplayMember = "Name";
                 lstCategories.ValueMember = "Id";
-                
+
                 ClearFields();
             }
             catch (Exception ex)
@@ -65,7 +65,7 @@ namespace PosApplication
                 try
                 {
                     bool success;
-                    
+
                     if (_selectedCategory == null)
                     {
                         var newCategory = new Category
@@ -73,7 +73,7 @@ namespace PosApplication
                             Name = txtName.Text.Trim(),
                             Description = txtDescription.Text.Trim()
                         };
-                        
+
                         success = await _productService.AddCategory(newCategory);
                         if (success)
                         {
@@ -84,14 +84,14 @@ namespace PosApplication
                     {
                         _selectedCategory.Name = txtName.Text.Trim();
                         _selectedCategory.Description = txtDescription.Text.Trim();
-                        
+
                         success = await _productService.UpdateCategory(_selectedCategory);
                         if (success)
                         {
                             MessageBox.Show("Category updated successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                     }
-                    
+
                     if (success)
                     {
                         LoadCategories();
@@ -112,7 +112,7 @@ namespace PosApplication
         {
             if (_selectedCategory != null)
             {
-                if (MessageBox.Show($"Are you sure you want to delete the category '{_selectedCategory.Name}'?", 
+                if (MessageBox.Show($"Are you sure you want to delete the category '{_selectedCategory.Name}'?",
                     "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     try
@@ -165,5 +165,6 @@ namespace PosApplication
 
             return true;
         }
+
     }
 } 

@@ -15,165 +15,189 @@ namespace PosApplication
 
         private void InitializeComponent()
         {
-            this.lblName = new System.Windows.Forms.Label();
-            this.txtName = new System.Windows.Forms.TextBox();
-            this.lblDescription = new System.Windows.Forms.Label();
-            this.txtDescription = new System.Windows.Forms.TextBox();
-            this.chkActive = new System.Windows.Forms.CheckBox();
-            this.btnSave = new System.Windows.Forms.Button();
-            this.btnCancel = new System.Windows.Forms.Button();
-            this.lstCategories = new System.Windows.Forms.ListBox();
-            this.btnDelete = new System.Windows.Forms.Button();
-            this.btnNew = new System.Windows.Forms.Button();
-            this.lblCategoryList = new System.Windows.Forms.Label();
-            this.SuspendLayout();
-            
-            // Form properties
-            this.BackColor = System.Drawing.Color.FromArgb(250, 250, 255);
-            this.Font = new System.Drawing.Font("Segoe UI", 9F);
-            
-            // lblCategoryList
-            this.lblCategoryList.AutoSize = true;
-            this.lblCategoryList.Location = new System.Drawing.Point(20, 20);
-            this.lblCategoryList.Name = "lblCategoryList";
-            this.lblCategoryList.Size = new System.Drawing.Size(120, 20);
-            this.lblCategoryList.TabIndex = 0;
-            this.lblCategoryList.Text = "Categories:";
-            this.lblCategoryList.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold);
-            this.lblCategoryList.ForeColor = System.Drawing.Color.FromArgb(50, 50, 100);
-            
-            // lstCategories
-            this.lstCategories.FormattingEnabled = true;
-            this.lstCategories.ItemHeight = 16;
-            this.lstCategories.Location = new System.Drawing.Point(20, 45);
-            this.lstCategories.Name = "lstCategories";
-            this.lstCategories.Size = new System.Drawing.Size(200, 260);
-            this.lstCategories.TabIndex = 1;
-            this.lstCategories.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.lstCategories.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.lstCategories.BackColor = System.Drawing.Color.White;
-            this.lstCategories.SelectedIndexChanged += new System.EventHandler(this.lstCategories_SelectedIndexChanged);
-            
+            lblName = new Label();
+            txtName = new TextBox();
+            lblDescription = new Label();
+            txtDescription = new TextBox();
+            chkActive = new CheckBox();
+            btnSave = new Button();
+            btnCancel = new Button();
+            lstCategories = new ListBox();
+            btnDelete = new Button();
+            btnNew = new Button();
+            lblCategoryList = new Label();
+            SuspendLayout();
+            // 
             // lblName
-            this.lblName.AutoSize = true;
-            this.lblName.Location = new System.Drawing.Point(240, 45);
-            this.lblName.Name = "lblName";
-            this.lblName.Size = new System.Drawing.Size(100, 20);
-            this.lblName.TabIndex = 2;
-            this.lblName.Text = "Category Name:";
-            this.lblName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblName.ForeColor = System.Drawing.Color.FromArgb(80, 80, 120);
-            
+            // 
+            lblName.AutoSize = true;
+            lblName.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblName.ForeColor = Color.FromArgb(80, 80, 120);
+            lblName.Location = new Point(274, 60);
+            lblName.Name = "lblName";
+            lblName.Size = new Size(123, 20);
+            lblName.TabIndex = 2;
+            lblName.Text = "Category Name:";
+            // 
             // txtName
-            this.txtName.Location = new System.Drawing.Point(350, 45);
-            this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(250, 25);
-            this.txtName.TabIndex = 3;
-            this.txtName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtName.Font = new System.Drawing.Font("Segoe UI", 9F);
-            
+            // 
+            txtName.BorderStyle = BorderStyle.FixedSingle;
+            txtName.Font = new Font("Segoe UI", 9F);
+            txtName.Location = new Point(400, 60);
+            txtName.Margin = new Padding(3, 4, 3, 4);
+            txtName.Name = "txtName";
+            txtName.Size = new Size(285, 27);
+            txtName.TabIndex = 3;
+            txtName.TextChanged += txtName_TextChanged;
+            // 
             // lblDescription
-            this.lblDescription.AutoSize = true;
-            this.lblDescription.Location = new System.Drawing.Point(240, 80);
-            this.lblDescription.Name = "lblDescription";
-            this.lblDescription.Size = new System.Drawing.Size(100, 20);
-            this.lblDescription.TabIndex = 4;
-            this.lblDescription.Text = "Description:";
-            this.lblDescription.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.lblDescription.ForeColor = System.Drawing.Color.FromArgb(80, 80, 120);
-            
+            // 
+            lblDescription.AutoSize = true;
+            lblDescription.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            lblDescription.ForeColor = Color.FromArgb(80, 80, 120);
+            lblDescription.Location = new Point(274, 107);
+            lblDescription.Name = "lblDescription";
+            lblDescription.Size = new Size(93, 20);
+            lblDescription.TabIndex = 4;
+            lblDescription.Text = "Description:";
+            // 
             // txtDescription
-            this.txtDescription.Location = new System.Drawing.Point(350, 80);
-            this.txtDescription.Name = "txtDescription";
-            this.txtDescription.Size = new System.Drawing.Size(250, 100);
-            this.txtDescription.TabIndex = 5;
-            this.txtDescription.Multiline = true;
-            this.txtDescription.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.txtDescription.Font = new System.Drawing.Font("Segoe UI", 9F);
-            
+            // 
+            txtDescription.BorderStyle = BorderStyle.FixedSingle;
+            txtDescription.Font = new Font("Segoe UI", 9F);
+            txtDescription.Location = new Point(400, 107);
+            txtDescription.Margin = new Padding(3, 4, 3, 4);
+            txtDescription.Multiline = true;
+            txtDescription.Name = "txtDescription";
+            txtDescription.Size = new Size(285, 133);
+            txtDescription.TabIndex = 5;
+            // 
             // chkActive
-            this.chkActive.AutoSize = true;
-            this.chkActive.Location = new System.Drawing.Point(350, 190);
-            this.chkActive.Name = "chkActive";
-            this.chkActive.Size = new System.Drawing.Size(100, 20);
-            this.chkActive.TabIndex = 6;
-            this.chkActive.Text = "Active";
-            this.chkActive.Checked = true;
-            this.chkActive.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.chkActive.ForeColor = System.Drawing.Color.FromArgb(80, 80, 120);
-            
+            // 
+            chkActive.AutoSize = true;
+            chkActive.Checked = true;
+            chkActive.CheckState = CheckState.Checked;
+            chkActive.Font = new Font("Segoe UI", 9F);
+            chkActive.ForeColor = Color.FromArgb(80, 80, 120);
+            chkActive.Location = new Point(400, 253);
+            chkActive.Margin = new Padding(3, 4, 3, 4);
+            chkActive.Name = "chkActive";
+            chkActive.Size = new Size(72, 24);
+            chkActive.TabIndex = 6;
+            chkActive.Text = "Active";
+            // 
             // btnSave
-            this.btnSave.Location = new System.Drawing.Point(350, 230);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(120, 35);
-            this.btnSave.TabIndex = 7;
-            this.btnSave.Text = "Save";
-            this.btnSave.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnSave.BackColor = System.Drawing.Color.FromArgb(100, 150, 200);
-            this.btnSave.ForeColor = System.Drawing.Color.White;
-            this.btnSave.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            
-            // btnNew
-            this.btnNew.Location = new System.Drawing.Point(20, 320);
-            this.btnNew.Name = "btnNew";
-            this.btnNew.Size = new System.Drawing.Size(90, 35);
-            this.btnNew.TabIndex = 8;
-            this.btnNew.Text = "New";
-            this.btnNew.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnNew.BackColor = System.Drawing.Color.FromArgb(120, 170, 120);
-            this.btnNew.ForeColor = System.Drawing.Color.White;
-            this.btnNew.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.btnNew.Click += new System.EventHandler(this.btnNew_Click);
-            
-            // btnDelete
-            this.btnDelete.Location = new System.Drawing.Point(130, 320);
-            this.btnDelete.Name = "btnDelete";
-            this.btnDelete.Size = new System.Drawing.Size(90, 35);
-            this.btnDelete.TabIndex = 9;
-            this.btnDelete.Text = "Delete";
-            this.btnDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnDelete.BackColor = System.Drawing.Color.FromArgb(220, 100, 100);
-            this.btnDelete.ForeColor = System.Drawing.Color.White;
-            this.btnDelete.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
-            this.btnDelete.Enabled = false;
-            
+            // 
+            btnSave.BackColor = Color.FromArgb(100, 150, 200);
+            btnSave.FlatStyle = FlatStyle.Flat;
+            btnSave.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnSave.ForeColor = Color.White;
+            btnSave.Location = new Point(400, 307);
+            btnSave.Margin = new Padding(3, 4, 3, 4);
+            btnSave.Name = "btnSave";
+            btnSave.Size = new Size(137, 47);
+            btnSave.TabIndex = 7;
+            btnSave.Text = "Save";
+            btnSave.UseVisualStyleBackColor = false;
+            btnSave.Click += btnSave_Click;
+            // 
             // btnCancel
-            this.btnCancel.Location = new System.Drawing.Point(480, 230);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(120, 35);
-            this.btnCancel.TabIndex = 10;
-            this.btnCancel.Text = "Close";
-            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancel.BackColor = System.Drawing.Color.FromArgb(220, 220, 240);
-            this.btnCancel.ForeColor = System.Drawing.Color.FromArgb(80, 80, 120);
-            this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            this.btnCancel.Click += new System.EventHandler(this.btnClose_Click);
-            
+            // 
+            btnCancel.BackColor = Color.FromArgb(220, 220, 240);
+            btnCancel.FlatStyle = FlatStyle.Flat;
+            btnCancel.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnCancel.ForeColor = Color.FromArgb(80, 80, 120);
+            btnCancel.Location = new Point(549, 307);
+            btnCancel.Margin = new Padding(3, 4, 3, 4);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(137, 47);
+            btnCancel.TabIndex = 10;
+            btnCancel.Text = "Close";
+            btnCancel.UseVisualStyleBackColor = false;
+            btnCancel.Click += btnClose_Click;
+            // 
+            // lstCategories
+            // 
+            lstCategories.BackColor = Color.White;
+            lstCategories.BorderStyle = BorderStyle.FixedSingle;
+            lstCategories.Font = new Font("Segoe UI", 9F);
+            lstCategories.FormattingEnabled = true;
+            lstCategories.Location = new Point(23, 60);
+            lstCategories.Margin = new Padding(3, 4, 3, 4);
+            lstCategories.Name = "lstCategories";
+            lstCategories.Size = new Size(228, 342);
+            lstCategories.TabIndex = 1;
+            lstCategories.SelectedIndexChanged += lstCategories_SelectedIndexChanged;
+            // 
+            // btnDelete
+            // 
+            btnDelete.BackColor = Color.FromArgb(220, 100, 100);
+            btnDelete.Enabled = false;
+            btnDelete.FlatStyle = FlatStyle.Flat;
+            btnDelete.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnDelete.ForeColor = Color.White;
+            btnDelete.Location = new Point(149, 427);
+            btnDelete.Margin = new Padding(3, 4, 3, 4);
+            btnDelete.Name = "btnDelete";
+            btnDelete.Size = new Size(103, 47);
+            btnDelete.TabIndex = 9;
+            btnDelete.Text = "Delete";
+            btnDelete.UseVisualStyleBackColor = false;
+            btnDelete.Click += btnDelete_Click;
+            // 
+            // btnNew
+            // 
+            btnNew.BackColor = Color.FromArgb(120, 170, 120);
+            btnNew.FlatStyle = FlatStyle.Flat;
+            btnNew.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            btnNew.ForeColor = Color.White;
+            btnNew.Location = new Point(23, 427);
+            btnNew.Margin = new Padding(3, 4, 3, 4);
+            btnNew.Name = "btnNew";
+            btnNew.Size = new Size(103, 47);
+            btnNew.TabIndex = 8;
+            btnNew.Text = "New";
+            btnNew.UseVisualStyleBackColor = false;
+            btnNew.Click += btnNew_Click;
+            // 
+            // lblCategoryList
+            // 
+            lblCategoryList.AutoSize = true;
+            lblCategoryList.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
+            lblCategoryList.ForeColor = Color.FromArgb(50, 50, 100);
+            lblCategoryList.Location = new Point(23, 27);
+            lblCategoryList.Name = "lblCategoryList";
+            lblCategoryList.Size = new Size(100, 23);
+            lblCategoryList.TabIndex = 0;
+            lblCategoryList.Text = "Categories:";
+            // 
             // CategoryForm
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(620, 370);
-            this.Controls.Add(this.lblCategoryList);
-            this.Controls.Add(this.lstCategories);
-            this.Controls.Add(this.lblName);
-            this.Controls.Add(this.txtName);
-            this.Controls.Add(this.lblDescription);
-            this.Controls.Add(this.txtDescription);
-            this.Controls.Add(this.chkActive);
-            this.Controls.Add(this.btnSave);
-            this.Controls.Add(this.btnNew);
-            this.Controls.Add(this.btnDelete);
-            this.Controls.Add(this.btnCancel);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "CategoryForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Category Management";
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            // 
+            AutoScaleDimensions = new SizeF(8F, 20F);
+            AutoScaleMode = AutoScaleMode.Font;
+            BackColor = Color.FromArgb(250, 250, 255);
+            ClientSize = new Size(709, 493);
+            Controls.Add(lblCategoryList);
+            Controls.Add(lstCategories);
+            Controls.Add(lblName);
+            Controls.Add(txtName);
+            Controls.Add(lblDescription);
+            Controls.Add(txtDescription);
+            Controls.Add(chkActive);
+            Controls.Add(btnSave);
+            Controls.Add(btnNew);
+            Controls.Add(btnDelete);
+            Controls.Add(btnCancel);
+            Font = new Font("Segoe UI", 9F);
+            FormBorderStyle = FormBorderStyle.FixedDialog;
+            Margin = new Padding(3, 4, 3, 4);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "CategoryForm";
+            StartPosition = FormStartPosition.CenterParent;
+            Text = "Category Management";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         private System.Windows.Forms.Label lblCategoryList;

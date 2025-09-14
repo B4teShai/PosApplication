@@ -28,7 +28,6 @@ namespace PosApplication
             ConfigureServices(services);
             ServiceProvider = services.BuildServiceProvider();
             
-            // Initialize database and create sample images
             InitializeDatabase();
             
             // Нэвтрэх форм
